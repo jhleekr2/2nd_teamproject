@@ -19,7 +19,7 @@
         }
 
         .find-account-container {
-            width: 40%; /* 창의 너비 */
+            width: 40%; /* 창의 너비   */
             padding: 60px;
             background-color: #383A3F; /* 큰 직사각형 배경 */
             border-radius: 10px;
