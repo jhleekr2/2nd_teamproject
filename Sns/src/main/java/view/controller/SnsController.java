@@ -107,6 +107,6 @@ public class SnsController {
     	//-> servlet-context.xml 파일 수정
     	
     	//게시글 등록
-//    	snsService.addContent();
+    	snsService.addContent();
     }
 }

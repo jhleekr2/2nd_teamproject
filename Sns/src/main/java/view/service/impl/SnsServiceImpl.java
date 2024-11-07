@@ -24,6 +24,12 @@ public class SnsServiceImpl implements SnsService {
 		return snsDao.View();
 	}
 
+	@Override
+	public void addContent() {
+		log.info("SnsService.addContent() 호출");
+		
+	}
+
 
 
 }

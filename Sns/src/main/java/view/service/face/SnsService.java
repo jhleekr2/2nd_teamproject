@@ -12,6 +12,11 @@ public interface SnsService {
 	 */
 	public List<Content> list();
 
+	/**
+	 * 게시물 등록
+	 */
+	public void addContent();
+
 
 
 }
