@@ -9,4 +9,20 @@
 	<select id="View" resultType="view.dto.Content">
 		SELECT * from content
 	</select>
+	
+	<insert id="addContentDB" parameterType="view.dto.Content" useGeneratedKeys="true" keyProperty="boardNo">
+		<selectKey order="BEFORE" resultType="int" keyProperty="boardNo">
+			SELECT content_seq.nextval FROM dual
+		</selectKey>
+		INSERT INTO content (boardNo, Memberno, title, content, "DATE")
+		VALUES (#{boardNo}, #{memberno}, #{title}, #{content}, SYSDATE)
+	</insert>
+	
+	<insert id="uploadFile" parameterType="view.dto.ContentFile">
+		<selectKey order="BEFORE" resultType="int" keyProperty="fileno">
+			SELECT fileno_seq.nextval FROM dual
+		</selectKey>
+		INSERT INTO files (fileno, boardNo, "PATH", original, stored)
+		VALUES (#{fileno}, #{boardNo}, #{path}, #{original}, #{stored})
+	</insert>
 </mapper>    

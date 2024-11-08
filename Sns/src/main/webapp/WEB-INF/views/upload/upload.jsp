@@ -128,7 +128,7 @@
         
         <!-- 사진 업로드 -->
         <label class="upload-label" for="file-upload">사진 선택</label>
-        <input type="file" id="file-upload" accept="image/*">
+        <input type="file" id="file-upload" name="file" accept="image/*">
         
         <!-- 게시 버튼 -->
         <button>게시</button>
