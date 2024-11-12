@@ -1,5 +1,8 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
+	
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+	
 <%@ include file="/WEB-INF/views/light/theme.jsp"%>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.1/font/bootstrap-icons.css">
 <!DOCTYPE html>
@@ -234,6 +237,8 @@ body {
 	text-decoration: underline;
 }
 </style>
+<script type="text/javascript" src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
 </head>
 <body>
 	<div class="top-bar">
@@ -251,18 +256,33 @@ body {
 			<input type="text" placeholder="검색...">
 		</div>
 	</div>
-
+	
 	<div class="content-wrapper" id="contentWrapper">
-		<% for (int i = 1; i <= 20; i++) { %>
+		<c:forEach var="content" items="${contentlist}">
 		<div class="post">
 			<div class="left-section">
+				<div class="boardNo">
+				${content.boardNo }
+				</div>
 				<div class="profile-overlay">
 					<img src="profile.jpg" alt="프로필"> <span class="username">사용자
-						<%= i %></span>
+						${content.memberno }</span>
 				</div>
+				<!-- 파일 출력 부분 -->
+                    <c:forEach var="file" items="${fileMap[content.boardNo]}">
+<%--         					<img src="${file.path}/${file.stored}" alt="사진"> --%>
+						<!-- 위 방식이 스프링 프레임워크에 의해 차단되어 우회를 해야함 -->	
+<%-- 						<a href="./image?fileno=${file.fileno }">이미지</a> --%>
+						<img src="./image?fileno=${file.fileno }">
+    				</c:forEach>	
 				<img src="image_placeholder.jpg" alt="사진">
 				<div class="post-actions">
-					<span>❤️ 좋아요</span> <span>💬 댓글</span>
+					<!-- 추천할때 테스트용으로 회원번호 2번으로 테스트 넣음 -->
+<%-- 					<a href="./recommend?memberno=2&boardNo=${content.boardNo}"/> --%>
+					    <a href="javascript:void(0);" class="like-btn" data-boardno="${content.boardNo}">
+                    <span>❤️ 좋아요</span></a> <span>💬 댓글</span>
+					<div id="isRecommend_${content.boardNo}"><h5>${recommendMap[content.boardNo] == 1 ? '추천됨' : '추천 안됨'}</h5></div>
+					<div id="recommendNo_${content.boardNo}"><h5>${numberofRecommend[content.boardNo] }</h5></div>
 				</div>
 			</div>
 			<div class="right-section">
@@ -271,7 +291,7 @@ body {
 				<div class="comment">댓글 3</div>
 			</div>
 		</div>
-		<% } %>
+		</c:forEach>
 	</div>
 
 	<div class="bottom-menu">
@@ -279,6 +299,10 @@ body {
 		<a href="#">홈</a> 
 		<i class="bi bi-chat-left-text"><a href="#">메세지</a> </i>
 		<a href="upload">게시물 작성</a> 
+		<a href="update">게시물 수정</a>
+		<!-- 게시물 수정 페이지는 본인이 작성한 게시물을 최근 순으로 조회한 다음에 수정 페이지를 따로 두어 -->
+		<!-- 게시물을 수정하는 인터페이스를 띄우고, 수정하면 업데이트 가능 -->
+		<!-- 게시물 삭제는 게시물 수정 페이지에서 같이 구현 -->
 		<a href="#">설정</a>
 	</div>
 
@@ -355,6 +379,43 @@ body {
         contentWrapper.addEventListener('mouseleave', () => {
             isDragging = false;
             contentWrapper.style.cursor = 'grab';
+        });
+        
+        $(function() {
+            // 추천 버튼 클릭 시
+            $(".like-btn").on("click", function() {
+                var boardNo = $(this).data("boardno");
+                var memberno = 2;  // 예시로 테스트용 사용자의 번호 2를 설정
+
+                // AJAX 요청
+                $.ajax({
+                    type: "GET",
+                    url: "./recommend",
+                    data: {
+                        memberno: memberno,
+                        boardNo: boardNo,
+                    },
+                    dataType: "json",
+                    success: function(response) {
+                        console.log("AJAX 성공");
+                        console.log(response);
+
+                        // 추천 여부와 추천 수 업데이트
+                        if(response.isRecommend == 0) {
+                        	$("div#isRecommend_" + boardNo).html("<h5>추천 안됨</h5>");
+                        }
+                        else {
+                        	$("div#isRecommend_" + boardNo).html("<h5>추천됨</h5>");
+                        }
+            			//div#recommendNo_boardNo에 응답 데이터 반영하기
+        				$("div#recommendNo_" + boardNo).html("<h5>" + response.recommendno + "</h5>");
+                        
+                    },
+                    error: function() {
+                        console.log("AJAX 실패");
+                    }
+                });
+            });
         });
     </script>
 </body>

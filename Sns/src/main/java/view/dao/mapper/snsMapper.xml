@@ -8,6 +8,7 @@
 	
 	<select id="View" resultType="view.dto.Content">
 		SELECT * from content
+		order by boardNo desc
 	</select>
 	
 	<insert id="addContentDB" parameterType="view.dto.Content" useGeneratedKeys="true" keyProperty="boardNo">
@@ -25,4 +26,48 @@
 		INSERT INTO files (fileno, boardNo, "PATH", original, stored)
 		VALUES (#{fileno}, #{boardNo}, #{path}, #{original}, #{stored})
 	</insert>
+	
+	<select id="getFileBoardno" resultType="view.dto.ContentFile">
+		SELECT fileno, boardNo, path, original, stored, uploadTime
+		FROM files
+		<where>
+			AND boardNo = #{boardNo}
+		</where>
+	</select>
+	
+	<select id="getFileno" resultType="view.dto.ContentFile">
+		SELECT fileno, boardNo, path, original, stored, uploadTime
+		FROM files
+		<where>
+			AND fileno = #{fileno}
+		</where>
+	</select>
+	
+	<select id="isRecommend" resultType="int">
+		SELECT COUNT(*) FROM recommend
+		<where>
+			AND boardNo = #{boardNo}
+			AND memberno = #{memberno}
+		</where> 
+	</select>
+	
+	<select id="RecommendNum" resultType="int">
+		SELECT COUNT(*) FROM recommend
+		<where>
+			AND boardNo = #{boardNo}
+		</where>
+	</select>
+	
+	<insert id="addRecommend" parameterType="view.dto.Recommend">
+		INSERT INTO recommend (boardNo, memberno)
+		VALUES (#{boardNo}, #{memberno} )
+	</insert>
+	
+	<delete id="delRecommend" parameterType="view.dto.Recommend">
+		DELETE FROM recommend
+		<where>
+			AND boardNo = #{boardNo}
+			AND memberno = #{memberno}
+		</where>
+	</delete>
 </mapper>    

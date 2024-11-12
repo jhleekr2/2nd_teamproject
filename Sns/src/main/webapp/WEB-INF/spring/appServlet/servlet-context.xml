@@ -21,12 +21,20 @@
 	<resources mapping="/resources/**" location="/resources/" />
 
 	<!-- Resolves views selected for rendering by @Controllers to .jsp resources in the /WEB-INF/views directory -->
+	<beans:bean class="org.springframework.web.servlet.view.BeanNameViewResolver">
+		<beans:property name="order" value="0"/>
+	</beans:bean>
+
 	<beans:bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
 		<beans:property name="prefix" value="/WEB-INF/views/" />
 		<beans:property name="suffix" value=".jsp" />
+		<beans:property name="order" value="1"/>
 	</beans:bean>
 	
-	<context:component-scan base-package="com.project.sns, *.controller, *.service" />
+	
+	<!-- 파일 다운로드 뷰 객체를 스프링 빈으로 등록하기 -->
+	<beans:bean id="viewimage" class="view.view.ImageView"/>
+	<context:component-scan base-package="com.project.sns, *.controller, *.service, view.view" />
 	
 	<!-- 파일 업로드 처리를 위해 넣어야 하는 설정 -->
 	
