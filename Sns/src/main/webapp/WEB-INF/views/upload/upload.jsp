@@ -38,6 +38,21 @@
             font-size: 32px;
         }
 
+		.upload-container input[type="text"] {
+			width: 100%;
+			height: 25px;
+			padding: 20px;
+			background-color: #2A2C30;
+			color: white;
+			border: none;
+            border-radius: 5px; /* 캡션 모서리 약간 둥글게 */
+            resize: none;
+			font-size: 24px;
+            margin-bottom: 20px;
+            box-sizing: border-box;
+		
+		}
+		
         .upload-container textarea {
             width: 100%;
             height: 250px; /* 캡션 입력란 */
@@ -90,13 +105,30 @@
     <h2>게시물 올리기</h2>
     
     <!-- form을 사용해 POST 메서드로 데이터를 전송 -->
-    <form action="/sns/main" method="POST">
+    <!-- 파일 업로드를 해야 하기에 multipart 사용 -->
+<!--     <form action="/sns/main" method="POST" enctype="multipart/form-data"> -->
+	<!-- 기존 main페이지 POST방식에서 upload POST 방식으로 수정함 -->
+    <form action="./upload" method="POST" enctype="multipart/form-data">
+    	<!-- 제목 입력 -->
+    	<table>
+    	<tr>
+    	<td>제목</td>
+    	<td>
+    		<input type="text" id="title" name="title" placeholder="제목">
+    	</td>
+    	</tr>
+    	
         <!-- 캡션 입력 -->
-        <textarea placeholder="캡션을 입력하세요..."></textarea>
+        <tr>
+        <td>내용</td>
+        <td>
+        	<textarea placeholder="캡션을 입력하세요..." id="content" name="content"></textarea>
+    	</td>
+    	</table>
         
         <!-- 사진 업로드 -->
         <label class="upload-label" for="file-upload">사진 선택</label>
-        <input type="file" id="file-upload" accept="image/*">
+        <input type="file" id="file-upload" name="file" accept="image/*">
         
         <!-- 게시 버튼 -->
         <button>게시</button>
