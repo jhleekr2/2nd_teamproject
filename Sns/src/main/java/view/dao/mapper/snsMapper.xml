@@ -70,4 +70,62 @@
 			AND memberno = #{memberno}
 		</where>
 	</delete>
+	
+	<select id="viewComment" parameterType="int">
+		SELECT commentno, boardno, memberno, DBMS_LOB.SUBSTR(content) content, "date" FROM "Comment"
+		<where>
+			AND boardNo = #{boardNo}
+		</where>
+	</select>
+	
+	<select id="checkMemberNick" parameterType="view.dto.Comment">
+		SELECT Nick from member
+		<where>
+			AND memberno = #{memberno}
+		</where>
+	</select>
+	
+	<select id="commentRecommendNo" parameterType="view.dto.Comment">
+		SELECT COUNT(*) FROM COMMENTLIKE
+		<where>
+			AND commentno = #{commentno}
+		</where>
+	</select>
+	
+	<select id="iscommentRecomment" parameterType="view.dto.Commentlike">
+		SELECT COUNT(*) FROM COMMENTLIKE
+		<where>
+			AND commentno = #{commentno}
+			AND memberno = #{memberno}
+		</where>
+	</select>
+	
+	<insert id="addRecommendComment" parameterType="view.dto.Commentlike">
+		INSERT INTO COMMENTLIKE (commentno, memberno)
+		VALUES (#{commentno}, #{memberno})
+	</insert>
+	
+	<delete id="delRecommendComment" parameterType="view.dto.Commentlike">
+		DELETE FROM COMMENTLIKE
+		<where>
+			AND commentno = #{commentno}
+			AND memberno = #{memberno}
+		</where>
+	</delete>
+	
+	<insert id="addComment" parameterType="view.dto.Comment">
+		<selectKey order="BEFORE" resultType="int" keyProperty="commentno">
+			SELECT comment_seq.nextval FROM dual
+		</selectKey>	
+		INSERT INTO "Comment" (commentno, boardno, memberno, content, "date")
+		VALUES (#{commentno}, #{boardNo}, #{memberno}, #{content}, SYSDATE)
+	</insert>
+	
+	<delete id="delComment" parameterType="view.dto.Comment">
+		DELETE FROM "Comment"
+		<where>
+			AND commentno = #{commentno}
+			AND memberno = #{memberno}
+		</where>
+	</delete>
 </mapper>    

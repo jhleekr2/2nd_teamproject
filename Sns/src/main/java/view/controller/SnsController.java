@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -16,6 +17,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import lombok.extern.slf4j.Slf4j;
+import view.dto.Comment;
+import view.dto.Commentlike;
 import view.dto.Content;
 import view.dto.ContentFile;
 import view.dto.Fileparam;
@@ -157,10 +160,8 @@ public class SnsController {
         // 추천수를 저장할 Map
         Map<Integer, Integer> RecommendMap = new HashMap<>();
         
-        // 댓글 리스트를 저장할 Map
-//        Map<Integer, List<Comment>> commentMap = new HashMap<>();
         
-        // 어쩌면 덧글과 덧글내용까지 추가될 수도 있음
+        // 어쩌면 덧글과 덧글내용까지 추가될 수도 있음 - 별도의 viewfile을 따로 구성하는 형태로 구성
         // 각 게시물에 대해 파일 목록, 추천 여부, 추천수를 조회하고 Map에 저장
         for (Content c : list) {
             System.out.println(c);
@@ -190,8 +191,8 @@ public class SnsController {
             // 게시물 번호를 키로 하고 추천 여부를 값으로 추가
             isRecommendMap.put(c.getBoardNo(), isRecommend);
 
-            // 모델에 isRecommendMap 추가
-            model.addAttribute("recommendMap", isRecommendMap);
+//            // 모델에 isRecommendMap 추가
+//            model.addAttribute("recommendMap", isRecommendMap);
 
             // 게시물의 추천수를 확인하기 위해 recommend라는 DTO를 다시 이용
             // 게시글 추천수 확인
@@ -201,9 +202,13 @@ public class SnsController {
             // 게시물 번호를 키로 하고 추천수를 값으로 추가 대입
             RecommendMap.put(c.getBoardNo(), Recommendno);
             
-            // 모델에 RecommendMap 추가
-            model.addAttribute("numberofRecommend", RecommendMap);
+//            // 모델에 RecommendMap 추가
+//            model.addAttribute("numberofRecommend", RecommendMap);
         }
+        // 모델에 isRecommendMap 추가
+        model.addAttribute("recommendMap", isRecommendMap);
+        // 모델에 RecommendMap 추가
+        model.addAttribute("numberofRecommend", RecommendMap);
 
         // 모델에 fileMap 추가                 
         model.addAttribute("fileMap", fileMap);
@@ -276,6 +281,194 @@ public class SnsController {
     	return result;
     }
     
+	@GetMapping("/viewcomment")
+	public void viewcomment(Model model, int memberno, int boardNo) {
+		log.info("model : {}", model);
+		log.info("memberno : {}", memberno);
+		log.info("boardNo : {}", boardNo);
+		
+		//View로부터 전달받은 변수 이용하여 댓글 조회
+		List<Comment> list = snsService.viewComment(boardNo);
+		
+		//BLOB 타입 조회
+		//일반적인 방식으로는 조회할 수 없고 다음과 같이 조회해야 한다
+		//SELECT DBMS_LOB.SUBSTR(BLOB_COLUMN_NAME) FROM 테이블명;
+		//이때 BLOB 타입 중 앞의 4000자만 조회되도록 내용이 잘리는거같다
+		//-> 되도록이면 BLOB 타입 사용하지 말자!
+		
+        // 댓글 작성자 리스트를 저장할 Map
+        Map<Integer, String> memberMap = new HashMap<>();
+        
+        // 댓글 추천수 리스트를 저장할 Map
+        Map<Integer, Integer> commentRecommendMap = new HashMap<>();
+        
+        // 사용자의 댓글 추천여부 리스트를 저장할 Map
+        Map<Integer, Integer> isCommentRecommendMap = new HashMap<>();
+		
+        // 로그인 사용자 번호(테스트용으로 사용자 번호 = 2로 지정하고 테스트)
+        //알고보니 이미 viewcomment에서 전달을 받았음
+        
+		//댓글이 없을 경우 예외처리를 해야 한다는 사실이 테스트 결과 밝혀져서 예외 처리 루틴 추가
+		if(list == null) {
+			System.out.println("댓글이 없습니다");
+		} else {
+			for(Comment c : list) {
+				System.out.println(c);
+				
+				//조회되는 댓글마다 작성자 닉네임과 추천수를 조회해야 한다
+				String viewcomment = snsService.checkMemberNick(c);
+				log.info("viewcomment: {}", viewcomment);
+				
+	            // 댓글 번호를 키로 하고 추천 여부를 값으로 추가
+	            memberMap.put(c.getCommentno(), viewcomment);
+	            
+	            
+	            //조회되는 댓글마다 추천수 조회
+//	            int commentrecommendno = snsService.commentRecommendNo(c);
+	            //코드 재사용성을 위해 코드를 다음과 같이 변경해 보자
+	            int commentrecommendno = snsService.commentRecommendNo(c.getCommentno());
+	            
+	            
+	            //댓글 번호를 키로 하고 추천수를 값으로 추가
+	            commentRecommendMap.put(c.getCommentno(), commentrecommendno);
+	            
+	            //commentlike라는 새로운 DTO를 정의(댓글 추천여부를 다루는 DTO)
+	            Commentlike commentlike = new Commentlike();
+	            
+	            //DTO에 로그인된 사용자 대입
+	            commentlike.setMemberno(memberno);
+	            //DTO에 댓글 번호 대입
+	            commentlike.setCommentno(c.getCommentno());
+	            
+	            //조회되는 댓글마다 로그인된 사용자의 추천여부 조회
+	            int isCommentRecommend = snsService.iscommentRecommend(commentlike);
+	            
+	            // 댓글 번호를 키로 하고 추천 여부를 값으로 추가
+	            isCommentRecommendMap.put(c.getCommentno(), isCommentRecommend);
+	            
+			}
+			
+			
+		}
+		//모델에 memberMap 추가
+		model.addAttribute("memberMap", memberMap);
+		//모델에 commentRecomendMap 추가
+		model.addAttribute("recommendMap", commentRecommendMap);
+		//모델에 iscommentRecommendMap 추가
+		model.addAttribute("isCommentRecommendMap", isCommentRecommendMap);
+		
+        // 모델에 list 추가(프론트단에서는 listcomment로 호출                 
+        model.addAttribute("listcomment", list);
+        
+	}
+
+	@ResponseBody //응답값을 뷰페이지 없이 그대로 응답
+	@PostMapping("/recommendcomment") //기존 게시글 추천 코드를 상당부분 재사용했다
+	public RecommendInfo recommendcommentProc(Model model, int memberno, int commentno) {
+		log.info("model : {}", model);
+		log.info("memberno : {}", memberno);
+		log.info("commentno : {}", commentno);
+		
+        // 사용자의 댓글 추천여부를 확인하기 위해 Commentlike라는 DTO를 따로 정의
+        Commentlike commentlike = new Commentlike();
+        
+        // 전달된 memberno와 commentno를 Commentlike DTO에 대입
+        commentlike.setCommentno(commentno);
+        commentlike.setMemberno(memberno);
+        
+        // 사용자의 댓글 추천여부 확인
+        int isCommentRecommend = snsService.iscommentRecommend(commentlike);
+        
+        if (isCommentRecommend == 0) {
+        	//댓글이 추천되어 있지 않을때
+        	//댓글 추천수 추가
+        	snsService.addRecommendComment(commentlike);
+        }
+        else {
+        	//이미 댓글이 추천되어 있을 때
+        	//댓글 추천수 삭제
+        	snsService.delRecommendComment(commentlike);
+        }
+        
+        // 댓글의 추천수를 확인하기 위해 recommend라는 DTO를 다시 이용
+        // 댓글 추천수 확인
+        int commentrecommendno = snsService.commentRecommendNo(commentno);
+        
+        //반환값으로 게시글 추천수와 추천여부를 업데이트해서 AJAX 방식으로 전송하는 것을 검토한다
+        RecommendInfo result = new RecommendInfo();
+        //이때 RecommendInfo DTO는 원래 게시글 추천수를 다루는 DTO지만
+        //댓글 추천수 부분에서 대입하는 변수명만 바꿔서 재사용한다
+        
+        // 사용자의 댓글 추천여부 다시 확인
+        isCommentRecommend = snsService.iscommentRecommend(commentlike);
+        
+        //확인된 글번호, 댓글 추천여부, 추천수 대입하고 반환
+        result.setBoardNo(commentno);
+        result.setIsRecommend(isCommentRecommend);
+        result.setRecommendno(commentrecommendno);
+    	return result;
+	}
+	
+	@ResponseBody //응답값을 뷰페이지 없이 그대로 응답 
+	@PostMapping("/uploadcomment")
+	public String uploadcomment(Model model, int boardNo, int memberno, String upcomment) {
+		log.info("uploadcomment() 호출");
+		log.info("model : {}", model );
+		log.info("boardNo: {}", boardNo);
+		log.info("memberno: {}", memberno);
+		log.info("upcomment: {}", upcomment);
+		
+		//AJAX 응답값
+		String response;
+		
+		//댓글 추가를 위해서 먼저 Comment타입의 DTO변수 하나를 정의한다
+		Comment param = new Comment();
+		
+		param.setBoardNo(boardNo);
+//		param.setCommentno(memberno) -> DB에서 자동부여
+		param.setContent(upcomment);
+//		param.setDate(null) -> DB에서 자동부여
+		param.setMemberno(memberno);
+		
+		//DB에 댓글 추가
+		snsService.addComment(param);
+        // 성공적으로 추가되었으면 응답
+		
+		response = "1";
+		
+		//응답 루틴을 try-catch 이용하여 댓글 추가/삭제 성공시와 실패시의
+		//AJAX 응답을 다르게 만드는 추가 개발을 할 수도 있다.
+    return response;
+	}
+	
+	@ResponseBody //응답값을 뷰페이지 없이 그대로 응답 
+	@PostMapping("/delcomment")
+	public String delcomment(Model model, int boardNo, int memberno, int commentno) {
+		log.info("delcomment() 호출");
+		log.info("model : {}", model );
+		log.info("boardNo: {}", boardNo);
+		log.info("memberno: {}", memberno);
+		log.info("commentno: {}", commentno);
+		
+		//AJAX 응답값
+		String response;
+		
+		//댓글 삭제를 위해서 먼저 Comment타입의 DTO변수 하나를 정의한다
+		Comment param = new Comment();
+		
+		param.setBoardNo(boardNo);
+		param.setMemberno(memberno);
+//		param.setContent(upcomment); -> 필요없음
+//		param.setDate(null) -> 필요없음
+		param.setCommentno(commentno);
+		
+		//DB에서 댓글 삭제
+		snsService.delComment(param);
+ 
+		response = "1";
+    return response;
+	}
+	
     @GetMapping("/update")
     public void update() {
     	

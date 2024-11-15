@@ -273,7 +273,7 @@ body {
 <%--         					<img src="${file.path}/${file.stored}" alt="사진"> --%>
 						<!-- 위 방식이 스프링 프레임워크에 의해 차단되어 우회를 해야함 -->	
 <%-- 						<a href="./image?fileno=${file.fileno }">이미지</a> --%>
-						<img src="./image?fileno=${file.fileno }">
+						<img src="/sns/image?fileno=${file.fileno }">
     				</c:forEach>	
 				<img src="image_placeholder.jpg" alt="사진">
 				<div class="post-actions">
@@ -286,9 +286,10 @@ body {
 				</div>
 			</div>
 			<div class="right-section">
-				<div class="comment">댓글 1</div>
-				<div class="comment">댓글 2</div>
-				<div class="comment">댓글 3</div>
+			<!-- 댓글 부분은 외부 파일을 새롭게 import 해서 구현할 생각 - 좀더 확장성있고 유연한 구조가 될 것으로 판단한다 -->
+			<!-- 개발이 어느정도 진행된 시점에서 외부파일 import 전략은 오히려 코드의 복잡성만 더하는 실패한 전략으로 결론나고 있다 -->
+			<!-- 당장 AJAX 코드가 예상치못한 치명적인 버그로 인해 JS 코드를 view.jsp로 이관해왔다는 것부터가 이미 실패의 징조 -->
+				<div id="viewComment" class="comment"><c:import url="/sns/viewcomment?memberno=2&boardNo=${content.boardNo }"></c:import></div>
 			</div>
 		</div>
 		</c:forEach>
@@ -382,7 +383,7 @@ body {
         });
         
         $(function() {
-            // 추천 버튼 클릭 시
+            // 추천 버튼 클릭시
             $(".like-btn").on("click", function() {
                 var boardNo = $(this).data("boardno");
                 var memberno = 2;  // 예시로 테스트용 사용자의 번호 2를 설정
@@ -416,6 +417,161 @@ body {
                     }
                 });
             });
+            
+        	//댓글 추천 버튼 클릭시
+//         	$(".comlike-btn").on("click", function() {
+        	
+        	//댓글 리스트가 페이지 로드 시에 한 번만 렌더링되고, 이후 AJAX로 댓글을 추가하거나 삭제한다면,
+        	//초기 로딩 시에만 이벤트 리스너가 적용되고 이후에는 적용되지 않기 때문에 이벤트 위임
+        	//(event delegation) 방식으로 문제를 해결해야 한다고 함.
+        	
+        	//댓글 추천 버튼에 관련한 AJAX 구현이 import되는 viewcomment.jsp에서 구현했더니
+        	//게시글 수만큼 AJAX가 중복해서 실행되는 문제가 발생하여 view.jsp로 AJAX 코드를
+        	//이관해 왔음
+        	// -> 게시글 수만큼 viewcomment.jsp가 중복 로드되면서 viewcomment.jsp에 있는
+        	//AJAX 코드도 중복해서 생성되는 것이 원인으로 밝혀졌다.
+        	$(document).on("click", ".comlike-btn", function() {
+        		var commentno = $(this).data("commentno");
+        		var memberno = 2; //예시로 테스트용 사용자의 번호 2를 설정
+        		
+        		// AJAX 요청
+        		$.ajax({
+        			type: "POST",
+        			url: "./recommendcomment",
+        			data: {
+        				commentno: commentno,
+        				memberno: memberno
+        			},
+        			dataType: "json",
+        			success: function(resp) {
+        				console.log("AJAX 성공");
+        				console.log(resp);
+        				
+        				// 추천 수 업데이트
+        				$("div#recommendcomm_" + commentno).html('<h3>' + resp.recommendno + '</h3>');
+        	            // 추천 여부에 따라 버튼 상태 업데이트
+        	            var recommendText = resp.isRecommend === 0 ? '추천' : '추천취소';
+        	            var recommendClass = resp.isRecommend === 0 ? 'comlike-btn' : 'comlike-btn'; // 추천 상태에 따라 클래스 추가
+
+        	            // 추천 여부를 변경한 div 내용 갱신
+        	            $("div#isrecommendcomm_" + commentno).html('<h5><a href="javascript:void(0);" class="' + recommendClass + '" data-commentno="' + commentno + '">' + recommendText + '</a></h5>');
+        			},
+        			error: function() {
+                        console.log("AJAX 실패");
+        			}
+        			
+        		});
+        	});
+        	
+        	//댓글 삭제할때
+        	$(document).on("click", ".comdel-btn", function() {
+                var boardNo = $(this).data("boardno");
+        		var commentno = $(this).data("commentno");
+        		var memberno = 2; //예시로 테스트용 사용자의 번호 2를 설정
+        	
+        		// AJAX 요청
+        		$.ajax({
+        			type: "POST",
+        			url: "./delcomment",
+        			data: {
+        				boardNo: boardNo,
+        				commentno: commentno,
+        				memberno: memberno
+        			},
+        			dataType: "json",
+        			success: function(response) {
+        				console.log("AJAX 성공");
+        				console.log(response);
+        				
+        	            // 댓글 목록을 갱신하는 요청
+        	            refreshComments(memberno, boardNo);
+        				
+        			},
+        			error: function() {
+                        console.log("AJAX 실패");
+                        
+                        // 댓글 목록을 갱신하는 요청
+        	            refreshComments(memberno, boardNo);
+        			}
+        			
+        		});
+        		
+        	
+        	});
+        	
+        	//댓글 입력할때
+        	//댓글을 입력하면 먼저 댓글을 서버로 전송하고, 이후 서버에서 댓글 뷰를 리다이렉트 처리
+        	
+        	
+        	$(document).on("click", ".addcomm", function(event) {
+        	    event.preventDefault();  // 폼 제출 기본 동작을 막음
+
+        	    // 폼 필드에서 값 가져오기
+        	    var memberno = $("input[name='memberno']").val();  // memberno 값
+        	    var boardNo = $("input[name='boardNo']").val();    // boardNo 값
+        	    var upcomment = $("#upcomment").val();               // 댓글 내용
+
+        	    // 댓글이 비어 있는지 체크
+        	    if (upcomment.trim() === "") {
+        	        alert("댓글을 입력하세요!");
+        	        return;
+        	    }
+
+        	    // 댓글을 서버로 전송하는 AJAX 요청
+        	    
+        	    //댓글을 입력하여 전송하면 먼저 댓글 전송 루틴이 실행되고,
+        	    //이후에 반환값은 null을 받는다. 이후 댓글 추가가 끝난 후에
+        	    //다시한번 AJAX방식으로 댓글 목록 갱신이 호출된다
+        	    //최종적으로는 갱신된 댓글 목록을 DOM 호출 이용하여 화면을 고친다
+        	    $.ajax({
+        	        type: "POST",
+        	        url: "./uploadcomment",  // 댓글을 전송할 URL
+        	        data: {
+        	            memberno: memberno,
+        	            boardNo: boardNo,
+        	            upcomment: upcomment   // 댓글 내용
+        	        },
+        	        datatype: "json",  // 응답 데이터 형식
+        	        success: function(response) {
+        	            console.log("댓글 입력 성공");
+        	            console.log(response);
+
+        	            // 댓글 입력란 초기화
+        	            $("#upcomment").val("");  // 댓글 입력 필드 초기화
+
+        	            // 댓글 목록을 갱신하는 요청
+        	            refreshComments(memberno, boardNo);
+        	        },
+        	        error: function() {
+        	            console.log("댓글 입력 실패");
+        	            
+        	            // 댓글 목록을 갱신하는 요청
+        	            refreshComments(memberno, boardNo);
+        	        }
+        	    });
+        	});
+
+        	// 댓글 목록을 갱신하는 함수, 나중에 댓글 삭제할때도 같은 함수가 호출될 것이다
+        	function refreshComments(memberno, boardNo) {
+        	    $.ajax({
+        	        type: "GET",  // GET 방식으로 댓글 목록 가져옴
+        	        url: "./viewcomment",  // 댓글 목록을 받을 URL
+        	        data: {
+        	            memberno: memberno,
+        	            boardNo: boardNo
+        	        },
+        	        datatype: "html",  // 서버로부터 HTML 형식으로 댓글 목록 받음
+        	        success: function(response) {
+        	            console.log("댓글 목록 갱신 성공");
+        	            // 댓글 목록을 해당 DOM에 갱신
+        	            $("#viewComment").html(response);  // #viewComment에 댓글 목록 업데이트
+        	           
+        	        },
+        	        error: function() {
+        	            console.log("댓글 목록 갱신 실패");
+        	        }
+        	    });
+        	}
         });
     </script>
 </body>

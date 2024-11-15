@@ -14,6 +14,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import lombok.extern.slf4j.Slf4j;
 import view.dao.face.SnsDao;
+import view.dto.Comment;
+import view.dto.Commentlike;
 import view.dto.Content;
 import view.dto.ContentFile;
 import view.dto.Fileparam;
@@ -198,4 +200,68 @@ public class SnsServiceImpl implements SnsService {
 		// 추천수 제거
 		snsDao.delRecommend(recommend);
 	}
+
+	@Override
+	public List<Comment> viewComment(int boardNo) {
+		// 게시글에 해당하는 댓글 조회
+		List<Comment> result = snsDao.viewComment(boardNo);
+		return result;
+	}
+
+	@Override
+	public String checkMemberNick(Comment c) {
+		// 댓글 작성자 닉네임 조회
+		String result = snsDao.checkMemberNick(c);
+		return result;
+	}
+
+	@Override
+	public int commentRecommendNo(Comment c) {
+		// 댓글 추천수 조회
+		int recommend = snsDao.commentRecommendNo(c);
+		return recommend;
+	}
+	
+	@Override
+	public int commentRecommendNo(int commentno) {
+		// 댓글 추천수 조회
+		//통일성 위해 Comment 데이터타입 DTO변수 잠깐 정의
+		Comment c = new Comment();
+		c.setCommentno(commentno);
+		int recommend = snsDao.commentRecommendNo(c);
+		return recommend;
+	}
+	
+
+	@Override
+	public int iscommentRecommend(Commentlike c) {
+		// 댓글 추천여부 조회(추천되어 있으면 1, 아니면 0)
+		int isRecommend = snsDao.iscommentRecomment( c );
+		return isRecommend;
+	}
+
+	@Override
+	public void addRecommendComment(Commentlike commentlike) {
+		// 댓글 추천수 추가
+		snsDao.addRecommendComment(commentlike);
+	}
+
+	@Override
+	public void delRecommendComment(Commentlike commentlike) {
+		// 댓글 추천수 삭제
+		snsDao.delRecommendComment(commentlike);
+	}
+
+	@Override
+	public void addComment(Comment param) {
+		// 댓글 추가
+		snsDao.addComment(param);
+	}
+
+	@Override
+	public void delComment(Comment param) {
+		// 댓글 삭제
+		snsDao.delComment(param);
+	}
+
 }

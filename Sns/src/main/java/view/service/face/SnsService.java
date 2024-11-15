@@ -2,6 +2,8 @@ package view.service.face;
 
 import java.util.List;
 
+import view.dto.Comment;
+import view.dto.Commentlike;
 import view.dto.Content;
 import view.dto.ContentFile;
 import view.dto.Fileparam;
@@ -63,8 +65,62 @@ public interface SnsService {
 	 * 게시글 추천수 제거
 	 * @param recommend 추천수 제거하고자 하는 게시글 번호와 회원정보
 	 */
-	
 	public void delRecommend(Recommend recommend);
+
+	/**
+	 * 게시물의 댓글 조회
+	 * @param boardNo 조회하고자 하는 게시물 번호
+	 * @return 게시물 번호에 해당하는 댓글
+	 */
+	public List<Comment> viewComment(int boardNo);
+
+	/**
+	 * 댓글 작성자 조회
+	 * @param c 조회하고자 하는 댓글
+	 * @return 댓글 작성자
+	 */
+	public String checkMemberNick(Comment c);
+
+	/**
+	 * 댓글 추천수 조회
+	 * @param c 조회하고자 하는 댓글 또는
+	 * @param commentno 조회하고자 하는 댓글 번호
+	 * @return 댓글 추천수
+	 */
+	public int commentRecommendNo(Comment c);
+	public int commentRecommendNo(int commentno);
+
+	/** 
+	 * 댓글 추천여부 조회
+	 * @param c 조회하고자 하는 댓글 번호와 로그인된 회원번호
+	 * @return 댓글 추천여부
+	 */
+	public int iscommentRecommend(Commentlike c);
+
+	/**
+	 * 댓글 추천수 추가
+	 * @param commentlike 추가하고자 하는 댓글 번호와 로그인된 회원번호
+	 */
+	public void addRecommendComment(Commentlike commentlike);
+
+	/**
+	 * 댓글 추천수 삭제
+	 * @param commentlike 삭제하고자 하는 댓글 번호와 로그인된 회원번호
+	 */
+	public void delRecommendComment(Commentlike commentlike);
+
+	/**
+	 * 댓글 추가
+	 * @param param 추가하고자 하는 댓글의 정보
+	 */
+	public void addComment(Comment param);
+	
+	/**
+	 * 댓글 삭제
+	 * @param param 삭제하고자 하는 댓글의 정보
+	 */
+	public void delComment(Comment param);
+
 
 
 
