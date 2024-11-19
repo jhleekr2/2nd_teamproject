@@ -79,8 +79,8 @@ ${isCommentRecommendMap }
 <!-- 	<input type="hidden" name="memberno" value="2"> 이렇게 하면 memberno가 String 방식으로 전달 -->
 
 	<!-- 사용자 정보는 임시로 2를 전달한다 -->
-	<input type="text" id="upcomment" name="upcomment">
-	<button class="addcomm">댓글 입력</button>
+	<input type="text" id="upcomment_${param.boardNo }" name="upcomment_${param.boardNo }">
+	<button class="addcomm_${param.boardNo}">댓글 입력</button>
 </form>
 
 <h3>댓글 마지막</h3>

@@ -289,7 +289,7 @@ body {
 			<!-- 댓글 부분은 외부 파일을 새롭게 import 해서 구현할 생각 - 좀더 확장성있고 유연한 구조가 될 것으로 판단한다 -->
 			<!-- 개발이 어느정도 진행된 시점에서 외부파일 import 전략은 오히려 코드의 복잡성만 더하는 실패한 전략으로 결론나고 있다 -->
 			<!-- 당장 AJAX 코드가 예상치못한 치명적인 버그로 인해 JS 코드를 view.jsp로 이관해왔다는 것부터가 이미 실패의 징조 -->
-				<div id="viewComment" class="comment"><c:import url="/sns/viewcomment?memberno=2&boardNo=${content.boardNo }"></c:import></div>
+				<div id="viewComment_${content.boardNo }" class="comment"><c:import url="/sns/viewcomment?memberno=2&boardNo=${content.boardNo }"></c:import></div>
 			</div>
 		</div>
 		</c:forEach>
@@ -503,53 +503,55 @@ body {
         	//댓글을 입력하면 먼저 댓글을 서버로 전송하고, 이후 서버에서 댓글 뷰를 리다이렉트 처리
         	
         	
-        	$(document).on("click", ".addcomm", function(event) {
-        	    event.preventDefault();  // 폼 제출 기본 동작을 막음
+			$(document).off("click", "[class^='addcomm_']").on("click", "[class^='addcomm_']", function(event) {
+    			event.preventDefault();  // 폼 제출 기본 동작을 막음
 
-        	    // 폼 필드에서 값 가져오기
-        	    var memberno = $("input[name='memberno']").val();  // memberno 값
-        	    var boardNo = $("input[name='boardNo']").val();    // boardNo 값
-        	    var upcomment = $("#upcomment").val();               // 댓글 내용
+    			var buttonClass = $(this).attr("class");  // 클릭한 버튼의 class를 가져옴
+    			console.log(buttonClass);  // console로 class 값을 확인
 
-        	    // 댓글이 비어 있는지 체크
-        	    if (upcomment.trim() === "") {
-        	        alert("댓글을 입력하세요!");
-        	        return;
-        	    }
+    			// 폼 필드에서 값 가져오기
+    			var memberno = $("input[name='memberno']").val();  // memberno 값
+    			var boardNo = buttonClass.split('_')[1];  // 'addcomm_${boardNo}' 형태에서 boardNo 추출
+    			console.log("boardNo:", boardNo);  // boardNo가 제대로 추출되는지 확인
 
-        	    // 댓글을 서버로 전송하는 AJAX 요청
-        	    
-        	    //댓글을 입력하여 전송하면 먼저 댓글 전송 루틴이 실행되고,
-        	    //이후에 반환값은 null을 받는다. 이후 댓글 추가가 끝난 후에
-        	    //다시한번 AJAX방식으로 댓글 목록 갱신이 호출된다
-        	    //최종적으로는 갱신된 댓글 목록을 DOM 호출 이용하여 화면을 고친다
-        	    $.ajax({
-        	        type: "POST",
-        	        url: "./uploadcomment",  // 댓글을 전송할 URL
-        	        data: {
-        	            memberno: memberno,
-        	            boardNo: boardNo,
-        	            upcomment: upcomment   // 댓글 내용
-        	        },
-        	        datatype: "json",  // 응답 데이터 형식
-        	        success: function(response) {
-        	            console.log("댓글 입력 성공");
-        	            console.log(response);
+			    // boardNo 값이 제대로 추출되었는지 확인 후, upcomment 요소를 찾음
+    			var upcomment = $('#upcomment_' + boardNo).val();  // .val()을 사용하여 입력 값 가져오기
+    			console.log("upcomment:", upcomment);  // upcomment 값 확인
 
-        	            // 댓글 입력란 초기화
-        	            $("#upcomment").val("");  // 댓글 입력 필드 초기화
+			    // 댓글이 비어 있는지 체크
+				if (upcomment.trim() === "") {
+	        		alert("댓글을 입력하세요!");
+       			return;
+			    }
 
-        	            // 댓글 목록을 갱신하는 요청
-        	            refreshComments(memberno, boardNo);
-        	        },
-        	        error: function() {
-        	            console.log("댓글 입력 실패");
-        	            
-        	            // 댓글 목록을 갱신하는 요청
-        	            refreshComments(memberno, boardNo);
-        	        }
-        	    });
-        	});
+			    // 댓글을 서버로 전송하는 AJAX 요청
+			    $.ajax({
+			        type: "POST",
+			        url: "./uploadcomment",  // 댓글을 전송할 URL
+			        data: {
+			            memberno: memberno,
+			            boardNo: boardNo,
+			            upcomment: upcomment   // 댓글 내용
+			        },
+			        datatype: "json",  // 응답 데이터 형식
+			        success: function(response) {
+			            console.log("댓글 입력 성공");
+			            console.log(response);
+			
+			            // 댓글 입력란 초기화
+			            $("#upcomment_" + boardNo).val("");  // 댓글 입력 필드 초기화
+			
+			            // 댓글 목록을 갱신하는 요청
+			            refreshComments(memberno, boardNo);
+			        },
+			        error: function() {
+			            console.log("댓글 입력 실패");
+			
+			            // 댓글 목록을 갱신하는 요청
+			            refreshComments(memberno, boardNo);
+			        }
+			    });
+			});
 
         	// 댓글 목록을 갱신하는 함수, 나중에 댓글 삭제할때도 같은 함수가 호출될 것이다
         	function refreshComments(memberno, boardNo) {
@@ -564,7 +566,7 @@ body {
         	        success: function(response) {
         	            console.log("댓글 목록 갱신 성공");
         	            // 댓글 목록을 해당 DOM에 갱신
-        	            $("#viewComment").html(response);  // #viewComment에 댓글 목록 업데이트
+        	            $("#viewComment_" + boardNo).html(response);  // #viewComment에 댓글 목록 업데이트
         	           
         	        },
         	        error: function() {

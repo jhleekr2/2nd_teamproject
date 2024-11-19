@@ -120,8 +120,49 @@ public interface SnsDao {
 	 * @param param 삭제하고자 하는 댓글
 	 */
 	public void delComment(Comment param);
-	
-	
 
+	/**
+	 * 회원이 작성한 게시물 리스트 확인
+	 * @param memberno 조회하고자 하는 회원번호
+	 * @return 작성 게시물 리스트
+	 */
+	public List<Content> listmember(int memberno);
+	
+	/**
+	 * 회원이 작성한 게시물 정보 조회
+	 * @param content 조회하고자 하는 게시물 정보
+	 * @return 조회된 게시물 정보
+	 */
+	public Content chkContentDB(Content content);
+
+	/**
+	 * 업로드된 파일을 DB에서 삭제
+	 * @param fileno DB에서 지우고자 하는 파일 번호
+	 */
+	public void delFile(String fileno);
+
+	/**
+	 * 게시물 수정
+	 * @param content 수정하고자 하는 게시물 정보
+	 */
+	public void UpdateContentDB(Content content);
+
+	/**
+	 * 삭제하려고 하는 게시물의 댓글 추천수 삭제
+	 * @param commentno 삭제하려는 게시물에 달린 댓글 번호
+	 */
+	public void delRecommendCommentforRemoveContent(int commentno);
+
+	/**
+	 * 삭제하려고 하는 게시물의 댓글 삭제
+	 * @param boardNo 삭제하려고 하는 게시물 번호
+	 */
+	public void removeComment(int boardNo);
+
+	/**
+	 * 게시물 삭제
+	 * @param param 삭제하려고 하는 게시물
+	 */
+	public void removeContent(Content param);
 
 }

@@ -121,6 +121,39 @@ public interface SnsService {
 	 */
 	public void delComment(Comment param);
 
+	/**
+	 * 사용자가 작성한 게시물 목록 조회
+	 * @param memberno 로그인된 사용자 번호
+	 * @return 게시물 목록
+	 */
+	public List<Content> listmember(int memberno);
+
+	/**
+	 * 회원이 작성한 게시물 정보 조회
+	 * @param param 조회하고자 하는 게시물 정보
+	 * @return 조회된 게시물 정보
+	 */
+	public Content chkContentDB(Content param);
+
+	/**
+	 * 삭제 요청 들어간 파일 삭제
+	 * @param delFiles 지울 파일 번호
+	 */
+	public void delfiles(List<String> delFiles);
+
+	/**
+	 * 게시물 및 파일 업데이트
+	 * @param param 업데이트되는 게시물의 내용
+	 * @param fileparam 업데이트해서 새로 올릴 파일
+	 */
+	public void updateContent(Content param, Fileparam fileparam);
+
+	/**
+	 * 게시글 삭제
+	 * @param param 삭제할 게시글 정보
+	 */
+	public void removeContent(Content param);
+
 
 
 
