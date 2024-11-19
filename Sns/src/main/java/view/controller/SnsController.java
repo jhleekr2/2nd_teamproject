@@ -7,13 +7,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import lombok.extern.slf4j.Slf4j;
@@ -461,6 +461,10 @@ public class SnsController {
 //		param.setDate(null) -> 필요없음
 		param.setCommentno(commentno);
 		
+		//테스트 결과 추천수가 있는 댓글이 삭제되지 않는 문제점이 발견
+		//추천수가 있으면 추천수 먼저 삭제 후 DB에서 댓글 삭제해야함
+		//snsService.delComment에 해당 코드 추가
+		
 		//DB에서 댓글 삭제
 		snsService.delComment(param);
  
@@ -469,17 +473,90 @@ public class SnsController {
 	}
 	
     @GetMapping("/update")
-    public void update() {
+    public void update(Model model) {
+    	log.info("update() 호출");
+    	//로그인 여부 확인 후 로그인되어 있으면 진행
+    	int memberno = 2; //임시로 회원번호 = 2로 설정하고 개발 진행
     	
+    	//로그인된 사용자가 작성한 게시글 목록 조회
+    	List<Content> list = snsService.listmember( memberno );
+    	
+		//조회된 리스트를 contentlist라는 프론트단 호출 변수로 모델에 추가
+		model.addAttribute("contentlist", list);
+		
     }
     
-    @PostMapping("/update")
-    public void updateProc() {
+    @GetMapping("/updatecontent")
+    public void updatecontent(Model model, int boardNo) {
+    	log.info("updatecontent() 호출");
+    	//로그인 여부 확인 후 로그인되어 있으면 진행
+    	int memberno = 2; //임시로 회원번호 = 2로 설정하고 개발 진행
+    	log.info("boardNo: {}", boardNo ); //정상적으로 파라미터가 전달된다
     	
+    	//전달받은 회원번호 및 게시글번호와 일치하는 게시물 조회
+    	
+    	//조회하기 위해서 Content 형식의 매개변수를 정의하고
+    	//나중에 조회한 게시물 정보를 저장하도록 한다
+    	Content param = new Content();
+    	
+    	//정의된 매개변수에 조회하고자 하는 값 대입
+    	param.setMemberno(memberno);
+    	param.setBoardNo(boardNo);
+    	
+    	//전달받은 회원번호 및 게시글번호와 일치하는 게시물 조회
+    	param = snsService.chkContentDB(param);
+    	
+    	//조회하고 View로 전달
+        // 모델에 content param 추가(프론트단에서는 content로 호출)                 
+        model.addAttribute("content", param);
+        
+        //업로드된 파일 조회
+        
+        // 업로드된 게시글에 해당하는 파일 리스트 조회하여 파일 정보를 DB에서 가져온다
+        // 이때 메인 뷰에서 파일을 보여주기 위해 사용했던 코드를 재활용한다
+        List<ContentFile> filelist = snsService.viewPhoto(param);
+        
+        log.info("filelist: {}", filelist);
+        //조회하고 View로 전달
+        // 모델에 filelist 추가(프론트단에서는 filelist로 호출)
+        model.addAttribute("filelist", filelist);
+    }
+    
+    
+    @PostMapping("/update")
+    public String updateProc(
+    		@RequestParam(value = "delCheck", required = false) List<String> delFiles, // 삭제할 파일 번호
+    		Content param, Fileparam fileparam
+    		) {
+    	log.info("delFiles: {}", delFiles);
+    	log.info("param: {}", param);
+    	log.info("fileparam : {}", fileparam);
+    	
+    	//삭제 요청 들어간 파일 삭제
+    	snsService.delfiles( delFiles );
+    	
+    	//게시글 업데이트 및 파일 업로드
+    	snsService.updateContent(param, fileparam);
+    	
+    	//게시글 목록으로 리다이렉트 or 포워딩(코드 추가 예정)
+    	return "redirect:view";
     }
     
     @GetMapping("/delete")
-    public void delete() {
+    public void delete(Model model, int boardNo) {
+    	//게시물 삭제
     	
+    	//임시로 회원번호 = 2로 두고 개발
+    	int memberno = 2;
+    	
+    	//게시글 삭제를 위해 Content param을 정의하고 회원번호와 게시글번호를 대입
+    	Content param = new Content();
+    	
+    	//받은 조건들을 대입하고 조건에 맞는 게시글을 삭제
+    	param.setBoardNo(boardNo);
+    	param.setMemberno(memberno);
+    	
+    	//게시글 삭제
+    	snsService.removeContent( param );
     }
 }

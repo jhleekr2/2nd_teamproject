@@ -76,6 +76,7 @@
 		<where>
 			AND boardNo = #{boardNo}
 		</where>
+		ORDER BY commentno ASC
 	</select>
 	
 	<select id="checkMemberNick" parameterType="view.dto.Comment">
@@ -126,6 +127,60 @@
 		<where>
 			AND commentno = #{commentno}
 			AND memberno = #{memberno}
+		</where>
+	</delete>
+	
+	<select id="listmember" parameterType="int">
+		SELECT * FROM CONTENT
+		<where>
+			AND memberno = #{memberno}
+		</where>
+		ORDER BY boardNo DESC
+	</select>
+	
+	<select id ="chkContentDB" parameterType="view.dto.Content">
+		SELECT * FROM CONTENT
+		<where>
+			AND memberno = #{memberno}
+			AND boardNo = #{boardNo}
+		</where>
+	</select>
+	
+	<delete id="delFile" parameterType="int">
+		DELETE FROM files
+		<where>
+			AND fileno = #{fileno}	
+		</where>
+	</delete>
+	
+	<update id="UpdateContentDB" parameterType="view.dto.Content">
+		UPDATE content 
+		SET title = #{title},
+		content = #{content},
+		"update" = SYSDATE
+		<where>
+			AND boardNo = #{boardNo}
+		</where>
+	</update>
+	
+	<delete id="delRecommendCommentforRemoveContent" parameterType="int">
+		DELETE FROM COMMENTLIKE
+		<where>
+			AND commentno = #{commentno}
+		</where>
+	</delete>
+	
+	<delete id="removeComment" parameterType="int">
+		DELETE FROM "Comment"
+		<where>
+			AND boardNo = #{boardNo}
+		</where>
+	</delete>
+	
+	<delete id="removeContent" parameterType="view.dto.Content">
+		DELETE FROM content
+		<where>
+			AND boardNo = #{boardNo}
 		</where>
 	</delete>
 </mapper>    
