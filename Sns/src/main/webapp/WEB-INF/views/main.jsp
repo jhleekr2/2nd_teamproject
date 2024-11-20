@@ -1,5 +1,8 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
+	
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+
 <%@ include file="/WEB-INF/views/light/theme.jsp"%>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.1/font/bootstrap-icons.css">
 <!DOCTYPE html>
@@ -253,13 +256,17 @@ body {
 	</div>
 
 	<div class="content-wrapper" id="contentWrapper">
-		<% for (int i = 1; i <= 20; i++) { %>
+		<c:forEach var="content" items="${contentlist}">
 		<div class="post">
 			<div class="left-section">
+				<div class="boardNo">
+				${content.boardNo }
+				</div>
 				<div class="profile-overlay">
 					<img src="profile.jpg" alt="프로필"> <span class="username">사용자
-						<%= i %></span>
+						${content.memberno }</span>
 				</div>
+				${filelist }
 				<img src="image_placeholder.jpg" alt="사진">
 				<div class="post-actions">
 					<span>❤️ 좋아요</span> <span>💬 댓글</span>
@@ -271,14 +278,18 @@ body {
 				<div class="comment">댓글 3</div>
 			</div>
 		</div>
-		<% } %>
+		</c:forEach>
 	</div>
 
 	<div class="bottom-menu">
 	<i class="bi bi-house">홈</i>
 		<a href="#">홈</a> 
 		<i class="bi bi-chat-left-text"><a href="#">메세지</a> </i>
-		<a href="upload">게시물 작성</a> 
+		<a href="upload">게시물 작성</a>
+		<a href="update">게시물 수정 및 삭제</a>
+		<!-- 게시물 수정 페이지는 본인이 작성한 게시물을 최근 순으로 조회한 다음에 수정 페이지를 따로 두어 -->
+		<!-- 게시물을 수정하는 인터페이스를 띄우고, 수정하면 업데이트 가능 -->
+		<!-- 게시물 삭제는 게시물 수정 페이지에서 같이 구현 -->
 		<a href="#">설정</a>
 	</div>
 

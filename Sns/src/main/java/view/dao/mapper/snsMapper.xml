@@ -1,0 +1,186 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="view.dao.face.SnsDao">
+	
+	<select id="View" resultType="view.dto.Content">
+		SELECT * from content
+		order by boardNo desc
+	</select>
+	
+	<insert id="addContentDB" parameterType="view.dto.Content" useGeneratedKeys="true" keyProperty="boardNo">
+		<selectKey order="BEFORE" resultType="int" keyProperty="boardNo">
+			SELECT content_seq.nextval FROM dual
+		</selectKey>
+		INSERT INTO content (boardNo, Memberno, title, content, "DATE")
+		VALUES (#{boardNo}, #{memberno}, #{title}, #{content}, SYSDATE)
+	</insert>
+	
+	<insert id="uploadFile" parameterType="view.dto.ContentFile">
+		<selectKey order="BEFORE" resultType="int" keyProperty="fileno">
+			SELECT fileno_seq.nextval FROM dual
+		</selectKey>
+		INSERT INTO files (fileno, boardNo, "PATH", original, stored)
+		VALUES (#{fileno}, #{boardNo}, #{path}, #{original}, #{stored})
+	</insert>
+	
+	<select id="getFileBoardno" resultType="view.dto.ContentFile">
+		SELECT fileno, boardNo, path, original, stored, uploadTime
+		FROM files
+		<where>
+			AND boardNo = #{boardNo}
+		</where>
+	</select>
+	
+	<select id="getFileno" resultType="view.dto.ContentFile">
+		SELECT fileno, boardNo, path, original, stored, uploadTime
+		FROM files
+		<where>
+			AND fileno = #{fileno}
+		</where>
+	</select>
+	
+	<select id="isRecommend" resultType="int">
+		SELECT COUNT(*) FROM recommend
+		<where>
+			AND boardNo = #{boardNo}
+			AND memberno = #{memberno}
+		</where> 
+	</select>
+	
+	<select id="RecommendNum" resultType="int">
+		SELECT COUNT(*) FROM recommend
+		<where>
+			AND boardNo = #{boardNo}
+		</where>
+	</select>
+	
+	<insert id="addRecommend" parameterType="view.dto.Recommend">
+		INSERT INTO recommend (boardNo, memberno)
+		VALUES (#{boardNo}, #{memberno} )
+	</insert>
+	
+	<delete id="delRecommend" parameterType="view.dto.Recommend">
+		DELETE FROM recommend
+		<where>
+			AND boardNo = #{boardNo}
+			AND memberno = #{memberno}
+		</where>
+	</delete>
+	
+	<select id="viewComment" parameterType="int">
+		SELECT commentno, boardno, memberno, DBMS_LOB.SUBSTR(content) content, "date" FROM "Comment"
+		<where>
+			AND boardNo = #{boardNo}
+		</where>
+		ORDER BY commentno ASC
+	</select>
+	
+	<select id="checkMemberNick" parameterType="view.dto.Comment">
+		SELECT Nick from member
+		<where>
+			AND memberno = #{memberno}
+		</where>
+	</select>
+	
+	<select id="commentRecommendNo" parameterType="view.dto.Comment">
+		SELECT COUNT(*) FROM COMMENTLIKE
+		<where>
+			AND commentno = #{commentno}
+		</where>
+	</select>
+	
+	<select id="iscommentRecomment" parameterType="view.dto.Commentlike">
+		SELECT COUNT(*) FROM COMMENTLIKE
+		<where>
+			AND commentno = #{commentno}
+			AND memberno = #{memberno}
+		</where>
+	</select>
+	
+	<insert id="addRecommendComment" parameterType="view.dto.Commentlike">
+		INSERT INTO COMMENTLIKE (commentno, memberno)
+		VALUES (#{commentno}, #{memberno})
+	</insert>
+	
+	<delete id="delRecommendComment" parameterType="view.dto.Commentlike">
+		DELETE FROM COMMENTLIKE
+		<where>
+			AND commentno = #{commentno}
+			AND memberno = #{memberno}
+		</where>
+	</delete>
+	
+	<insert id="addComment" parameterType="view.dto.Comment">
+		<selectKey order="BEFORE" resultType="int" keyProperty="commentno">
+			SELECT comment_seq.nextval FROM dual
+		</selectKey>	
+		INSERT INTO "Comment" (commentno, boardno, memberno, content, "date")
+		VALUES (#{commentno}, #{boardNo}, #{memberno}, #{content}, SYSDATE)
+	</insert>
+	
+	<delete id="delComment" parameterType="view.dto.Comment">
+		DELETE FROM "Comment"
+		<where>
+			AND commentno = #{commentno}
+			AND memberno = #{memberno}
+		</where>
+	</delete>
+	
+	<select id="listmember" parameterType="int">
+		SELECT * FROM CONTENT
+		<where>
+			AND memberno = #{memberno}
+		</where>
+		ORDER BY boardNo DESC
+	</select>
+	
+	<select id ="chkContentDB" parameterType="view.dto.Content">
+		SELECT * FROM CONTENT
+		<where>
+			AND memberno = #{memberno}
+			AND boardNo = #{boardNo}
+		</where>
+	</select>
+	
+	<delete id="delFile" parameterType="int">
+		DELETE FROM files
+		<where>
+			AND fileno = #{fileno}	
+		</where>
+	</delete>
+	
+	<update id="UpdateContentDB" parameterType="view.dto.Content">
+		UPDATE content 
+		SET title = #{title},
+		content = #{content},
+		"update" = SYSDATE
+		<where>
+			AND boardNo = #{boardNo}
+		</where>
+	</update>
+	
+	<delete id="delRecommendCommentforRemoveContent" parameterType="int">
+		DELETE FROM COMMENTLIKE
+		<where>
+			AND commentno = #{commentno}
+		</where>
+	</delete>
+	
+	<delete id="removeComment" parameterType="int">
+		DELETE FROM "Comment"
+		<where>
+			AND boardNo = #{boardNo}
+		</where>
+	</delete>
+	
+	<delete id="removeContent" parameterType="view.dto.Content">
+		DELETE FROM content
+		<where>
+			AND boardNo = #{boardNo}
+		</where>
+	</delete>
+</mapper>    

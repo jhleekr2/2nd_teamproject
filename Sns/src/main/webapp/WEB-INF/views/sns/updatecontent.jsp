@@ -1,10 +1,13 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+
 <!DOCTYPE html> 
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>게시물 올리기</title>
+    <title>게시물 수정하기</title>
     <style>
         body {
             display: flex;
@@ -102,19 +105,18 @@
 <body>
 
 <div class="upload-container">
-    <h2>게시물 올리기</h2>
-    
+    <h2>게시물 수정하기</h2>
     <!-- form을 사용해 POST 메서드로 데이터를 전송 -->
     <!-- 파일 업로드를 해야 하기에 multipart 사용 -->
 <!--     <form action="/sns/main" method="POST" enctype="multipart/form-data"> -->
 	<!-- 기존 main페이지 POST방식에서 upload POST 방식으로 수정함 -->
-    <form action="./upload" method="POST" enctype="multipart/form-data">
+    <form action="./update" method="POST" enctype="multipart/form-data">
     	<!-- 제목 입력 -->
     	<table>
     	<tr>
     	<td>제목</td>
     	<td>
-    		<input type="text" id="title" name="title" placeholder="제목">
+    		<input type="text" id="title" name="title" value="${content.title }">
     	</td>
     	</tr>
     	
@@ -122,14 +124,34 @@
         <tr>
         <td>내용</td>
         <td>
-        	<textarea placeholder="캡션을 입력하세요..." id="content" name="content"></textarea>
+        	<textarea id="content" name="content">${content.content }</textarea>
     	</td>
     	</table>
+        <div id="beforefile">
+        <table>
+        	<c:forEach var="filelist" items="${filelist}" >
+        	<tr>
+        		<td>
+				<a href="/sns/image?fileno=${filelist.fileno }">${filelist.original}</a>
+				</td>
+				<td>
+					<span id="delFile">
+					<i class="bi bi-trash-fill"></i>
+					</span>
+					<input type="checkbox" name="delCheck" value="${filelist.fileno }"> 삭제
+				</td>
+        	</tr>
+        	</c:forEach>
+        </table>
         
+        </div>
         <!-- 사진 업로드 -->
         <label class="upload-label" for="file-upload">사진 선택</label>
         <input type="file" id="file-upload" name="file" accept="image/*">
-        
+        <input type="hidden" id="boardNo" name="boardNo" value="${content.boardNo }">
+        <input type="hidden" id="memberno" name="memberno" value="${content.memberno }">
+        <input type="hidden" id="isopened" name="isopened" value="${content.isopened }">
+  		
         <!-- 게시 버튼 -->
         <button>게시</button>
     </form>
