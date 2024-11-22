@@ -574,7 +574,37 @@ body {
         	        }
         	    });
         	}
-        });
-    </script>
+        	
+          	// 댓글 페이지네이션 관련 코드
+            // 페이지네이션 링크 클릭 시 AJAX 호출
+//             $(".page-link").click(function(event) {}
+            $(document).on('click', '.page-link', function(event) {
+                event.preventDefault();  // 기본 링크 동작 막기
+                
+                
+                var curPage = $(this).attr('data-curpage');  // 페이지 번호 추출
+                var boardNo = $(this).data('boardno');  // 현재 게시물 번호
+                var memberNo = 2;  // 현재 사용자 번호 (임시로 2 설정)
+                
+                // AJAX 요청
+                $.ajax({
+                    url: './viewcomment',  // 댓글을 새로 불러오는 URL
+                    type: 'GET',
+                    data: {
+                        boardNo: boardNo,
+                        memberno: memberNo,
+                        curPage: curPage  // 현재 페이지 번호
+                    },
+                    success: function(response) {
+                        // 댓글 영역 갱신
+                        $('#viewComment_' + boardNo).html(response);  // 새로운 댓글 데이터를 받아서 갱신
+                    },
+                    error: function() {
+                        alert('댓글을 불러오는 데 오류가 발생했습니다.');
+                    }
+        		});
+            });
+		});
+</script>
 </body>
 </html>

@@ -79,6 +79,19 @@
 		ORDER BY commentno ASC
 	</select>
 	
+	<select id="viewCommentwithPaging" parameterType="view.dto.Pagingcomm">
+		SELECT * FROM
+			(SELECT rownum rnum, B.* FROM
+				(SELECT commentno, boardno, memberno, DBMS_LOB.SUBSTR(content) content, "date" FROM "Comment"
+				<where>
+					<if test="boardNo != null">
+					AND boardNo = #{boardNo}
+					</if>
+				</where>
+				ORDER BY commentno ASC) B )
+		WHERE rnum BETWEEN #{startNo} AND #{endNo}
+	</select>
+	
 	<select id="checkMemberNick" parameterType="view.dto.Comment">
 		SELECT Nick from member
 		<where>
@@ -138,6 +151,22 @@
 		ORDER BY boardNo DESC
 	</select>
 	
+	<select id="listmemberwithPaging" parameterType="view.dto.Paging">
+		SELECT * FROM	
+			(SELECT rownum rnum, B.* FROM	
+				(SELECT * FROM CONTENT
+					<where>
+						<if test="search != null and search != ''">
+							title LIKE '%' || #{search} || '%'
+						</if>
+						<if test="memberno != null">
+        					AND memberno = #{memberno}
+        				</if>
+					</where>
+				ORDER BY boardNo DESC) B )
+		WHERE rnum BETWEEN #{startNo} AND #{endNo}
+	</select>
+	
 	<select id ="chkContentDB" parameterType="view.dto.Content">
 		SELECT * FROM CONTENT
 		<where>
@@ -183,4 +212,25 @@
 			AND boardNo = #{boardNo}
 		</where>
 	</delete>
+	
+	<select id="selectCntAll" parameterType="map">
+	    SELECT count(*) FROM content
+    	<where>
+        	<if test="search != null and search != ''">
+            	AND title LIKE '%' || #{search} || '%'
+        	</if>
+        	<if test="memberno != null">
+        		AND memberno = #{memberno}
+        	</if>
+    	</where>
+	</select>
+	
+	<select id="selectCntAllComm" parameterType="int">
+		SELECT count(*) FROM "Comment"
+		<where>
+			<if test="boardNo != null">
+				AND boardNo = #{boardNo}
+			</if>
+		</where>
+	</select>
 </mapper>    

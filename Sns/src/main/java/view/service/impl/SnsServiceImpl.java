@@ -20,6 +20,8 @@ import view.dto.Commentlike;
 import view.dto.Content;
 import view.dto.ContentFile;
 import view.dto.Fileparam;
+import view.dto.Paging;
+import view.dto.Pagingcomm;
 import view.dto.Recommend;
 import view.service.face.SnsService;
 
@@ -214,6 +216,13 @@ public class SnsServiceImpl implements SnsService {
 	}
 
 	@Override
+	public List<Comment> viewComment(Pagingcomm paging) {
+		// 게시글에 해당하는 댓글을 페이징을 반영하여 조회
+		List<Comment> result = snsDao.viewCommentwithPaging( paging );
+		return result;
+	}
+	
+	@Override
 	public String checkMemberNick(Comment c) {
 		// 댓글 작성자 닉네임 조회
 		String result = snsDao.checkMemberNick(c);
@@ -277,6 +286,11 @@ public class SnsServiceImpl implements SnsService {
 		return snsDao.listmember(memberno);
 	}
 
+	@Override
+	public List<Content> listmember(Paging paging) {
+		// 회원이 작성한 게시물 리스트를 페이지네이션을 적용하여 확인
+		return snsDao.listmemberwithPaging(paging);
+	}
 	@Override
 	public Content chkContentDB(Content param) {
 		// 회원이 작성한 게시물 정보 조회
@@ -454,5 +468,67 @@ public class SnsServiceImpl implements SnsService {
 		//마지막으로 게시글 삭제
 		snsDao.removeContent( param );
 	}
+
+	@Override
+	public Paging getPagingContent(Paging paging) {
+		// 게시물의 페이징 계산하기
+		// 전달파라미터 curPage 추출하기
+		int curPage = paging.getCurPage();
+		
+		// 전달파라미터 search 추출하기
+		String search = paging.getSearch();
+		
+		// 전달파라미터 memberno 추출하기
+		int memberno = paging.getMemberno();
+		
+		//아래 코드는 스프링 프레임워크 + 롬복 플러그인때문에 사용X
+		//테스트 결과 잘못된 요청이 오면 알아서 스프링 프레임워크에서 자체적으로 요청을 거부한다
+		
+		//서블릿 게시판 만들때는 추가되어야 하는 코드
+//		int curPage = 0;
+		
+//		if( param != null && !"".equals(param) ) {
+//			curPage = Integer.parseInt(param);
+//		} else {
+//			System.out.println("[경고] BoardService - curPage값이 null이거나 비어있음");
+//		}
+		
+		
+		//검색어가 반영된 게시글 수 조회하기(없으면 총 게시글 수 조회한다)
+//		int totalCount = snsDao.selectCntAll( search );
+
+		//검색어, 회원정보가 모두 반영된 게시글 수 조회하기(없으면 총 게시글 수 조회한다)
+		int totalCount = snsDao.selectCntAll( search, memberno );
+		
+		//이때 마이바티스가 2개 이상의 변수를 잘 받아들이지 못하는 문제가 발생하니 주의한다.
+		//따라서, snsDao에서 넘기려는 2개 이상의 변수 각각을 @Param 어노테이션을 사용해서 넘겨야 한다.
+		
+		//페이징 계산하기
+//		Paging paging2 = new Paging(curPage, totalCount);
+		//검색어가 반영된 페이징 계산하기
+//		Paging paging2 = new Paging(curPage, totalCount, search);
+		//검색어, 회원정보가 모두 반영된 페이징 계산하기
+		Paging paging2 = new Paging(curPage, totalCount, search, memberno);
+		return paging2;
+	}
+
+
+	@Override
+	public Pagingcomm getPagingComm(Pagingcomm paging) {
+		// 댓글의 페이징 계산하기
+		// 전달파라미터 curPage 추출하기
+		int curPage = paging.getCurPage();
+		
+		// 전달파라미터 boardNo 추출하기
+		int boardNo = paging.getBoardNo();
+		
+		//게시물 번호가 반영된 게시글 수 조회하기(없으면 총 댓글 수 조회한다)
+		int totalCount = snsDao.selectCntAllComm( boardNo );
+		
+		//게시물 번호가 반영된 페이징 계산하기
+		Pagingcomm paging2 = new Pagingcomm(curPage, totalCount, boardNo);
+		return paging2;
+	}
+
 
 }
