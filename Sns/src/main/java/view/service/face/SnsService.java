@@ -7,6 +7,8 @@ import view.dto.Commentlike;
 import view.dto.Content;
 import view.dto.ContentFile;
 import view.dto.Fileparam;
+import view.dto.Paging;
+import view.dto.Pagingcomm;
 import view.dto.Recommend;
 
 public interface SnsService {
@@ -70,9 +72,11 @@ public interface SnsService {
 	/**
 	 * 게시물의 댓글 조회
 	 * @param boardNo 조회하고자 하는 게시물 번호
+	 * @param paging 조회하고자 하는 페이징이 반영된 게시물 번호
 	 * @return 게시물 번호에 해당하는 댓글
 	 */
 	public List<Comment> viewComment(int boardNo);
+	public List<Comment> viewComment(Pagingcomm paging);
 
 	/**
 	 * 댓글 작성자 조회
@@ -124,9 +128,11 @@ public interface SnsService {
 	/**
 	 * 사용자가 작성한 게시물 목록 조회
 	 * @param memberno 로그인된 사용자 번호
+	 * @param paging 페이징과 로그인된 사용자 번호
 	 * @return 게시물 목록
 	 */
 	public List<Content> listmember(int memberno);
+	public List<Content> listmember(Paging paging);
 
 	/**
 	 * 회원이 작성한 게시물 정보 조회
@@ -153,6 +159,23 @@ public interface SnsService {
 	 * @param param 삭제할 게시글 정보
 	 */
 	public void removeContent(Content param);
+
+	/**
+	 * 게시물의 페이징을 알아낸다
+	 * @param paging 현재 페이징 객체
+	 * @return 전체 게시물을 반영한 페이징 객체
+	 */
+	public Paging getPagingContent(Paging paging);
+
+	/**
+	 * 댓글의 페이징을 알아낸다
+	 * @param paging 현재 페이징 객체
+	 * @return 전체 댓글을 반영한 페이징 객체
+	 */
+	public Pagingcomm getPagingComm(Pagingcomm paging);
+
+
+
 
 
 

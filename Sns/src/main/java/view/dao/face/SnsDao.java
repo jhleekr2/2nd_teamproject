@@ -2,10 +2,14 @@ package view.dao.face;
 
 import java.util.List;
 
+import org.apache.ibatis.annotations.Param;
+
 import view.dto.Comment;
 import view.dto.Commentlike;
 import view.dto.Content;
 import view.dto.ContentFile;
+import view.dto.Paging;
+import view.dto.Pagingcomm;
 import view.dto.Recommend;
 
 public interface SnsDao {
@@ -75,7 +79,15 @@ public interface SnsDao {
 	 * @return 조회된 댓글
 	 */
 	public List<Comment> viewComment(int boardNo);
+	// 윈래는 viewComment 삭제하려 했지만, 사용되는 부분이 있어 남겨둠
 
+	/**
+	 * 게시글에 해당하는 댓글을 페이징을 반영하여 조회
+	 * @param paging 조회하고자 하는 게시글 번호 및 페이징
+	 * @return 조회된 댓글
+	 */
+	public List<Comment> viewCommentwithPaging(Pagingcomm paging);
+	
 	/**
 	 * 댓글 작성자 닉네임 조회
 	 * @param c 조회하고자 하는 댓글
@@ -127,7 +139,15 @@ public interface SnsDao {
 	 * @return 작성 게시물 리스트
 	 */
 	public List<Content> listmember(int memberno);
+	// 윈래는 listmember 삭제하려 했지만, 추후 사용될 가능성이 높아 남겨둠
 	
+	/**
+	 * 회원이 작성한 게시물 리스트를 페이징을 적용하여 확인
+	 * @param paging 조회하고자 하는 회원번호 및 페이징
+	 * @return 페이징에 맞는 작성 게시물 리스트
+	 */
+	public List<Content> listmemberwithPaging(Paging paging);
+
 	/**
 	 * 회원이 작성한 게시물 정보 조회
 	 * @param content 조회하고자 하는 게시물 정보
@@ -164,5 +184,22 @@ public interface SnsDao {
 	 * @param param 삭제하려고 하는 게시물
 	 */
 	public void removeContent(Content param);
+
+	/**
+	 * 검색어와 회원번호를 만족하는 게시물의 개수 구하기
+	 * @param search 검색어
+	 * @param memberno 작성자 회원번호
+	 * @return 조건을 만족하는 게시물의 개수
+	 */
+	public int selectCntAll(@Param("search") String search, @Param("memberno") int memberno);
+
+	/**
+	 * 게시물 번호를 만족하는 댓글의 개수 구하기
+	 * @param boardNo 조회하고자 하는 게시물 번호
+	 * @return 조건을 만족하는 댓글의 개수
+	 */
+	public int selectCntAllComm(int boardNo);
+
+
 
 }

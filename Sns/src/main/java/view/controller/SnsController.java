@@ -22,6 +22,8 @@ import view.dto.Commentlike;
 import view.dto.Content;
 import view.dto.ContentFile;
 import view.dto.Fileparam;
+import view.dto.Paging;
+import view.dto.Pagingcomm;
 import view.dto.Recommend;
 import view.dto.RecommendInfo;
 import view.service.face.SnsService;
@@ -281,13 +283,30 @@ public class SnsController {
     }
     
 	@GetMapping("/viewcomment")
-	public void viewcomment(Model model, int memberno, int boardNo) {
+	public void viewcomment(Model model, int memberno, int boardNo, Pagingcomm paging) {
 		log.info("model : {}", model);
 		log.info("memberno : {}", memberno);
 		log.info("boardNo : {}", boardNo);
 		
+		
+		//페이징 변수에 조회하고자 하는 게시물번호 대입
+		paging.setBoardNo(boardNo);
+		
+		//전달파라미터를 이용하여 현재 페이징 객체 알아내기
+		paging = snsService.getPagingComm(paging);
+		
 		//View로부터 전달받은 변수 이용하여 댓글 조회
-		List<Comment> list = snsService.viewComment(boardNo);
+//		List<Comment> list = snsService.viewComment(boardNo);
+		
+		
+		//댓글 페이지네이션 적용
+		//본래는 게시글의 페이지네이션을 공용으로 쓰려 했으나
+		//변수명이 꼬이는 등의 문제가 발생(스파게티 코드) 된다 판단하여
+		//댓글 페이지네이션 DTO(VO)를 분리하여 정의할 생각
+		
+		//페이지네이션 적용하여 댓글 조회
+		List<Comment> list = snsService.viewComment(paging);
+		
 		
 		//BLOB 타입 조회
 		//일반적인 방식으로는 조회할 수 없고 다음과 같이 조회해야 한다
@@ -309,7 +328,7 @@ public class SnsController {
         
 		//댓글이 없을 경우 예외처리를 해야 한다는 사실이 테스트 결과 밝혀져서 예외 처리 루틴 추가
 		if(list == null) {
-			System.out.println("댓글이 없습니다");
+			log.info("댓글이 없습니다");
 		} else {
 			for(Comment c : list) {
 				System.out.println(c);
@@ -355,6 +374,9 @@ public class SnsController {
 		model.addAttribute("recommendMap", commentRecommendMap);
 		//모델에 iscommentRecommendMap 추가
 		model.addAttribute("isCommentRecommendMap", isCommentRecommendMap);
+		
+    	//페이징 정보를 paging이라는 프론트단 호출 변수로 모델에 추가
+    	model.addAttribute("paging", paging);
 		
         // 모델에 list 추가(프론트단에서는 listcomment로 호출                 
         model.addAttribute("listcomment", list);
@@ -473,14 +495,28 @@ public class SnsController {
 	}
 	
     @GetMapping("/update")
-    public void update(Model model) {
+    public void update(Model model, Paging paging) {
     	log.info("update() 호출");
     	//로그인 여부 확인 후 로그인되어 있으면 진행
     	int memberno = 2; //임시로 회원번호 = 2로 설정하고 개발 진행
     	
-    	//로그인된 사용자가 작성한 게시글 목록 조회
-    	List<Content> list = snsService.listmember( memberno );
+    	//페이징 변수에 조회하고자 하는 회원번호 대입
+    	paging.setMemberno(memberno);
     	
+    	//이때 검색기능도 추가할 수 있다.
+    	
+		//전달파라미터를 이용하여 현재 페이징 객체 알아내기
+		paging = snsService.getPagingContent(paging);
+    	
+    	//로그인된 사용자가 작성한 게시글 목록 조회
+//    	List<Content> list = snsService.listmember( memberno );
+    	
+		//로그인된 사용자가 작성한 게시글 목록을 페이지네이션 적용하여 조회
+		List<Content> list = snsService.listmember( paging );
+    	
+		//페이징 정보를 paging이라는 프론트단 호출 변수로 모델에 추가
+		model.addAttribute("paging", paging);
+		
 		//조회된 리스트를 contentlist라는 프론트단 호출 변수로 모델에 추가
 		model.addAttribute("contentlist", list);
 		

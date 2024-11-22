@@ -83,4 +83,41 @@ ${isCommentRecommendMap }
 	<button class="addcomm_${param.boardNo}">댓글 입력</button>
 </form>
 
+<div class="paging">
+    <ul class="pagination justify-content-center">
+        <c:if test="${paging.curPage ne 1 }">
+        <li class="page-item">
+            <a class="page-link" href="javascript:void(0);" data-boardno="${param.boardNo}" data-curpage="1">&larr; 처음</a>
+        </li>
+        </c:if>
+        <c:if test="${paging.startPage ne 1 }">
+        <li class="page-item">
+            <a class="page-link" href="javascript:void(0);" data-boardno="${param.boardNo}" data-curpage="${paging.startPage - paging.pageCount}">&laquo;</a>
+        </li>
+        </c:if>
+        <c:forEach var="i" begin="${paging.startPage}" end="${paging.endPage}">
+            <c:if test="${paging.curPage eq i }">
+            <li class="page-item active">
+                <a class="page-link" href="javascript:void(0);" data-boardno="${param.boardNo}" data-curpage="${i}">${i}</a>
+            </li>
+            </c:if>
+            <c:if test="${paging.curPage ne i }">
+            <li class="page-item">
+                <a class="page-link" href="javascript:void(0);" data-boardno="${param.boardNo}" data-curpage="${i}">${i}</a>
+            </li>
+            </c:if>
+        </c:forEach>
+        <c:if test="${paging.endPage ne paging.totalPage }">
+        <li class="page-item">
+            <a class="page-link" href="javascript:void(0);" data-boardno="${param.boardNo}" data-curpage="${paging.startPage + paging.pageCount}">&raquo;</a>
+        </li>
+        </c:if>
+        <c:if test="${paging.curPage ne paging.totalPage }">
+        <li class="page-item">
+            <a class="page-link" href="javascript:void(0);" data-boardno="${param.boardNo}" data-curpage="${paging.totalPage}">&rarr; 마지막</a>
+        </li>
+        </c:if>
+    </ul>
+</div>
+
 <h3>댓글 마지막</h3>
