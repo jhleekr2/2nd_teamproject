@@ -284,6 +284,8 @@ body {
 	<div class="bottom-menu">
 	<i class="bi bi-house">홈</i>
 		<a href="#">홈</a> 
+		<i>main/webapp/WEB-INF/views/main.jsp
+		</i>
 		<i class="bi bi-chat-left-text"><a href="#">메세지</a> </i>
 		<a href="upload">게시물 작성</a>
 		<a href="update">게시물 수정 및 삭제</a>
