@@ -35,7 +35,7 @@
 	<tr>
 		<td>${content.boardNo}</td>
 		<td>${content.memberno}</td>
-		<td><a href="./updatecontent?boardNo=${content.boardNo}">${content.title}</a></td>
+		<td><a href="./update?boardNo=${content.boardNo}">${content.title}</a></td>
 		<td>${content.isopened}</td>
 		<td>${content.date}</td>
 		<td>${content.ad}</td>
@@ -56,14 +56,14 @@
 	<%-- 첫 페이지로 이동 --%>
 	<c:if test="${paging.curPage ne 1 }">
 	<li class="page-item">
-		<a class="page-link" href="./update">&larr; 처음</a>
+		<a class="page-link" href="./mycontent">&larr; 처음</a>
 	</li>
 	</c:if>
 
 	<%-- 이전 페이징 리스트로 이동 --%>
 	<c:if test="${paging.startPage ne 1 }">
 	<li class="page-item">
-		<a class="page-link" href="./update?curPage=${paging.startPage - paging.pageCount }&search=${paging.search}">&laquo;</a>
+		<a class="page-link" href="./mycontent?curPage=${paging.startPage - paging.pageCount }&search=${paging.search}">&laquo;</a>
 	</li>
 	</c:if>
 
@@ -71,12 +71,12 @@
 	<c:forEach var="i" begin="${paging.startPage }" end="${paging.endPage }">
 		<c:if test="${paging.curPage eq i }">
 			<li class="page-item active">
-				<a class="page-link" href="./update?curPage=${i }&search=${paging.search}">${i }</a>
+				<a class="page-link" href="./mycontent?curPage=${i }&search=${paging.search}">${i }</a>
 			</li>
 		</c:if>
 		<c:if test="${paging.curPage ne i }">
 			<li class="page-item">
-				<a class="page-link" href="./update?curPage=${i }&search=${paging.search}">${i }</a>
+				<a class="page-link" href="./mycontent?curPage=${i }&search=${paging.search}">${i }</a>
 			</li>
 		</c:if>
 	</c:forEach>
@@ -84,14 +84,14 @@
 	<%-- 다음 페이징 리스트로 이동 --%>
 	<c:if test="${paging.endPage ne paging.totalPage }">
 	<li class="page-item">
-		<a class="page-link" href="./update?curPage=${paging.startPage + paging.pageCount }&search=${paging.search}">&raquo;</a>
+		<a class="page-link" href="./mycontent?curPage=${paging.startPage + paging.pageCount }&search=${paging.search}">&raquo;</a>
 	</li>
 	</c:if>
 	
 	<%-- 마지막 페이지로 이동 --%>
 	<c:if test="${paging.curPage ne paging.totalPage }">
 	<li class="page-item">
-		<a class="page-link" href="./update?curPage=${paging.totalPage }&search=${paging.search}">&rarr; 마지막</a>
+		<a class="page-link" href="./mycontent?curPage=${paging.totalPage }&search=${paging.search}">&rarr; 마지막</a>
 	</li>
 	</c:if>
 	
