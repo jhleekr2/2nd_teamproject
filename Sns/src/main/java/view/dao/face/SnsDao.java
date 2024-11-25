@@ -178,6 +178,12 @@ public interface SnsDao {
 	 * @param boardNo 삭제하려고 하는 게시물 번호
 	 */
 	public void removeComment(int boardNo);
+	
+	/**
+	 * 게시글 추천 삭제
+	 * @param boardNo 삭제하려고 하는 게시물 번호
+	 */
+	public void removeRecommend(int boardNo);
 
 	/**
 	 * 게시물 삭제
@@ -199,6 +205,7 @@ public interface SnsDao {
 	 * @return 조건을 만족하는 댓글의 개수
 	 */
 	public int selectCntAllComm(int boardNo);
+
 
 
 

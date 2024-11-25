@@ -132,7 +132,7 @@
         	<c:forEach var="filelist" items="${filelist}" >
         	<tr>
         		<td>
-				<a href="/sns/image?fileno=${filelist.fileno }">${filelist.original}</a>
+				<a href="/main/image?fileno=${filelist.fileno }">${filelist.original}</a>
 				</td>
 				<td>
 					<span id="delFile">

@@ -206,6 +206,13 @@
 		</where>
 	</delete>
 	
+	<delete id="removeRecommend" parameterType="int">
+		DELETE FROM RECOMMEND
+		<where>
+			AND boardNo = #{boardNo}
+		</where>
+	</delete>
+	
 	<delete id="removeContent" parameterType="view.dto.Content">
 		DELETE FROM content
 		<where>
