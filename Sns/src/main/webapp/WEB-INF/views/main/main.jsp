@@ -248,11 +248,19 @@ body {
 					세션 아이디 : <%=session.getId() %><br>
 					세션 로그인 회원번호 : ${sessionScope.memberNo}<br>
 					세션 로그인 회원번호 : <%=session.getAttribute("memberNo") %>
-			<div class="username"><%=session.getAttribute("memberID") %>님 안녕하세요</div>
+			<div class="username">
+			<c:if test="${sessionScope.islogin }"><%=session.getAttribute("memberID") %>님 안녕하세요</c:if>
+			<c:if test="${empty sessionScope.islogin }">로그인하세요</c:if>
+			</div>
 
 			<!-- 드롭다운 메뉴 -->
 			<div class="dropdown-menu" id="dropdownMenu">
+				<c:if test="${sessionScope.islogin }">
 				<a href="/member/logout" onclick="logout()">로그아웃</a>
+				</c:if>
+				<c:if test="${empty sessionScope.islogin }">
+				<a href="/member/login">로그인</a>
+				</c:if>
 			</div>
 		</div>
 		<div class="search-bar">
@@ -282,10 +290,10 @@ body {
 				<div class="post-actions">
 					<!-- 추천할때 테스트용으로 회원번호 2번으로 테스트 넣음 -->
 <%-- 					<a href="./recommend?memberno=2&boardNo=${content.boardNo}"/> --%>
-					    <a href="javascript:void(0);" class="like-btn" data-boardno="${content.boardNo}">
-                    <span>❤️ 좋아요</span></a> <span>💬 댓글</span>
-					<div id="isRecommend_${content.boardNo}"><h5>${recommendMap[content.boardNo] == 1 ? '추천됨' : '추천 안됨'}</h5></div>
-					<div id="recommendNo_${content.boardNo}"><h5>${numberofRecommend[content.boardNo] }</h5></div>
+					<a href="javascript:void(0);" class="like-btn" data-boardno="${content.boardNo}">
+					<div id="isRecommend_${content.boardNo}"><span>${recommendMap[content.boardNo] == 1 ? '❤️ 좋아요 취소' : '❤️ 좋아요'}</span></div></a>
+                    <span>💬 댓글</span> <div id="recommendNo_${content.boardNo}"><span>${numberofRecommend[content.boardNo] }</span></div>
+					
 				</div>
 			</div>
 			<div class="right-section">
@@ -407,13 +415,13 @@ body {
 
                         // 추천 여부와 추천 수 업데이트
                         if(response.isRecommend == 0) {
-                        	$("div#isRecommend_" + boardNo).html("<h5>추천 안됨</h5>");
+                        	$("div#isRecommend_" + boardNo).html("<span>❤️ 좋아요</span>");
                         }
                         else {
-                        	$("div#isRecommend_" + boardNo).html("<h5>추천됨</h5>");
+                        	$("div#isRecommend_" + boardNo).html("<span>❤️ 좋아요 취소</span>");
                         }
             			//div#recommendNo_boardNo에 응답 데이터 반영하기
-        				$("div#recommendNo_" + boardNo).html("<h5>" + response.recommendno + "</h5>");
+        				$("div#recommendNo_" + boardNo).html("<span>" + response.recommendno + "</span>");
                         
                     },
                     error: function() {
