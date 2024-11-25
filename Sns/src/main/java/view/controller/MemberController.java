@@ -3,6 +3,8 @@ package view.controller;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 
+import javax.servlet.http.HttpSession;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import lombok.extern.slf4j.Slf4j;
+import view.dao.face.MemberDao;
 import view.dto.Login;
 import view.dto.Member;
 import view.service.face.MemberService;
@@ -92,7 +95,7 @@ public class MemberController {
     }
     
     @PostMapping("/login")
-    public String login(Login login, RedirectAttributes redirectAttributes) {
+    public String login(Login login, RedirectAttributes redirectAttributes, HttpSession session) {
         String loginErrorMessage = null;
 
         log.info("로그인 시도 - 입력된 아이디: {}, 비밀번호: {}", login.getMemberID(), login.getPassword());
@@ -119,9 +122,35 @@ public class MemberController {
 
         // 로그인 성공 시
         log.info("로그인 성공: {}", login.getMemberID());
+        
+        //로그인 아이디에 맞는 회원번호를 DB에서 조회하고
+        int memberNo = memberService.getMemberno(login);
+
+        log.info("로그인한 회원의 회원번호: {}", memberNo);
+
+        //로그인 여부와 로그인 회원번호를 세션에 기록한다.
+        session.setAttribute("islogin", true);
+        session.setAttribute("memberNo", memberNo);
+        session.setAttribute("memberID", login.getMemberID());
+        
+        //이후 세션을 이용해서 로그인된 회원만 접근할 수 있는 기능 제한을 걸 것이다.
+        
         return "redirect:/main/main"; // 메인 페이지로 리다이렉트
     }
     
-    
+    @GetMapping("/logout")
+    public String logout(HttpSession session) {
+    	// 로그아웃 구현
+    	
+    	// 세션 삭제
+    	//세션이 이미 무효화되었다는 오류가 발생하여서 예외처리를 해야 할듯
+    	//원인은 찾았지만, 이미 만들어놓은 예외처리 코드는 그대로 살려둠
+    	if(session != null) {
+    		session.invalidate();
+    	}
+    	
+    	//로그아웃(세션 삭제) 후 로그인 페이지로 리다이렉트
+    	return "redirect:/member/login";
+    }
     
 }

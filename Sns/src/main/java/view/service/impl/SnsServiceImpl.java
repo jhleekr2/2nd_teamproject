@@ -465,6 +465,13 @@ public class SnsServiceImpl implements SnsService {
 		//검색된 파일 삭제
 		snsService.delfiles(delFiles);
 		
+		//게시글에 추천수가 있을 경우 삭제되지 않는 문제점이 발견되었음
+		// -> 게시글 추천수 삭제해야함
+		
+		//게시글 추천 삭제
+		snsDao.removeRecommend(boardNo);
+		
+		
 		//마지막으로 게시글 삭제
 		snsDao.removeContent( param );
 	}

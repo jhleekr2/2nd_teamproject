@@ -80,4 +80,7 @@ public interface MemberService {
     // 비밀번호 변경
     boolean updatePassword(String memberId, String newPassword);
 
+    // 로그인 성공시 회원번호 조회
+	public int getMemberno(Login login);
+
 }

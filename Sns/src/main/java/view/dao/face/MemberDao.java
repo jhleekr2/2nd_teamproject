@@ -4,24 +4,25 @@ import java.util.List;
 
 import org.apache.ibatis.annotations.Param;
 
+import view.dto.Login;
 import view.dto.Member;
 
 public interface MemberDao {
 
-    /**
+	/**
+	 * 새로운 회원 정보를 DB에 삽입
+	 * 
+	 * @param member 삽입할 회원 정보를 담고 있는 Member 객체
+	 */
+	public void insertMember(Member member);
+    
+	/**
      * 주어진 memberID로 회원 정보를 조회
      * 
      * @param memberID 조회할 회원의 ID
      * @return 조회된 회원 정보를 담은 Member 객체, 없으면 null 반환
      */
     public Member findByMemberID(String memberID);
-
-    /**
-     * 새로운 회원 정보를 DB에 삽입
-     * 
-     * @param member 삽입할 회원 정보를 담고 있는 Member 객체
-     */
-    public void insertMember(Member member);
 
     /**
      * 주어진 memberId의 중복 여부를 확인
@@ -70,6 +71,9 @@ public interface MemberDao {
 
     // 비밀번호 변경
     public int updatePassword(@Param("memberId") String memberId, @Param("newPassword") String newPassword);
+
+    // 로그인 성공시 회원번호 조회
+	public int getMemberno(Login login);
 
 
 

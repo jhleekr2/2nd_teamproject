@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpSession;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -31,11 +33,10 @@ import view.service.face.SnsService;
 public class BoardController {
 
 	//서비스 객체 의존성 주입
-	
 	@Autowired 
 	private SnsService snsService;
 	@GetMapping("/main")
-	public String mainPage(Content content, Model model) {
+	public void mainPage(Content content, Model model, HttpSession session) {
 		log.info("mainPage() 호출");
 		
 		//기존 SnsController.java 파일에서 /sns/view에 해당하는 코드부분을 가져온다
@@ -43,7 +44,6 @@ public class BoardController {
 		
     	//랜덤한 게시물 목록 조회(단, 조회순서는 최근글 순으로 조회한다)
     	//조회할때 본래 AI가 있어야 한다
-    	//AI로서 가중치 랜덤 알고리즘을 사용한다
     	//다만, 이 프로젝트에선 포함하지 않을 생각!
 		
     	//랜덤한 게시글 목록 조회
@@ -79,8 +79,19 @@ public class BoardController {
             recommend.setBoardNo(c.getBoardNo());
             
             // 테스트용 사용자 번호를 recommend DTO에 대입
-            recommend.setMemberno(2);
+//            recommend.setMemberno(2);
+            // 세션에서 로그인된 사용자 번호를 recommend DTO에 대입
+            // 이때 로그인된 사용자 번호는 Object 타입이므로
+            // Object -> String -> Int로 형변환을 거쳐서 대입한다
             
+            //세션이 이미 무효화되었다는 오류가 발생하기 때문에 예외처리를 좀 함.
+            //이부분은 나중에 확인 결과 비회원 게시글 조회기능에서 사용되는 부분
+           try {
+        	   recommend.setMemberno( Integer.parseInt ( String.valueOf ( session.getAttribute("memberNo") ) ) );
+           } catch (Exception e) {
+        	   log.info("로그인하세요");
+           }
+           
             // 사용자의 게시글 추천여부 확인
             int isRecommend = snsService.checkRecommend(recommend);
             log.info("isRecommend: {}", isRecommend);
@@ -110,17 +121,26 @@ public class BoardController {
         // 모델에 fileMap 추가                 
         model.addAttribute("fileMap", fileMap);
         
-	    return "main/main"; // main/main.jsp로 이동
+//	    return "main/main"; // main/main.jsp로 이동
 	}
 	
 	@GetMapping("/upload")
-	public void upload() {
+	public String upload(HttpSession session) {
 		
+		log.info(String.valueOf(session.getAttribute("islogin")));
+		//업로드 시도할때 로그인되어 있는지 확인하여 로그인이 안되어 있다면
+		//이때 값이 true면 로그인, null이면 로그인이 안된 상태
+		if(String.valueOf(session.getAttribute("islogin")) != "true") {
+			//로그인 화면으로 리다이렉트
+			return "redirect:/member/login";
+		}
+		// 로그인되어 있으면 그냥 upload 호출
+		return null;
 	}
 	
     @PostMapping("/upload")
 //  public String uploadProc(Content content, Model model, Fileparam fileparam, MultipartFile file) {
-	public String uploadProc(Content content, Model model, Fileparam fileparam) {
+	public String uploadProc(Content content, Model model, Fileparam fileparam, HttpSession session) {
 		log.info("uploadProc() [POST] 호출");
 
 		// 파일 업로드 및 게시글 추가 코드 있어야 함
@@ -137,7 +157,10 @@ public class BoardController {
 
 		// 로그인 부분과 결합하여 게시글 작성 사용자번호를 세션으로부터 넣겠지만
 		// 현재 단계에서는 세션부분 고려하지 않고 테스트데이터를 대신 넣음
-		content.setMemberno(2); // 테스트용 Memberno = 2
+//		content.setMemberno(2); // 테스트용 Memberno = 2
+		
+		// 로그인, 세션 부분과 결합한 게시글 작성 사용자번호를 세션으로부터 넣는 코드
+		content.setMemberno( Integer.parseInt ( String.valueOf ( session.getAttribute("memberNo") ) ) );
 
 		// 게시글 등록
 		snsService.addContent(content, fileparam);
@@ -181,6 +204,12 @@ public class BoardController {
         // 전달된 memberno와 boardNo를 Recommend DTO에 대입
         recommend.setBoardNo(boardNo);
         recommend.setMemberno(memberno);
+        
+        // 사용자 정보가 전달되지 않았을때(높은 확률로 로그인되지 않았을때)
+        if(recommend.getMemberno() == 0) {
+        	// 이때는 처리하지 않는다
+        	return null;
+        }
         
         // 사용자의 게시글 추천여부 확인
         int isRecommend = snsService.checkRecommend(recommend);
@@ -426,13 +455,20 @@ public class BoardController {
 	}
     
     @GetMapping("/mycontent")
-    public void mycontent(Model model, Paging paging) {
+    public String mycontent(Model model, Paging paging, HttpSession session) {
 		log.info("mycontent() 호출");
 		
     	//로그인 여부 확인 후 로그인되어 있으면 진행
-    	int memberno = 2; //임시로 회원번호 = 2로 설정하고 개발 진행
-    	
-    	//페이징 변수에 조회하고자 하는 회원번호 대입
+//    	int memberno = 2; //임시로 회원번호 = 2로 설정하고 개발 진행
+		if(String.valueOf(session.getAttribute("islogin")) != "true") {
+			//로그인되어있지 않으면 로그인 화면으로 리다이렉트
+			return "redirect:/member/login";
+		}
+		
+		//세션에서 로그인된 회원번호를 가져온다
+    	int memberno = Integer.parseInt ( String.valueOf ( session.getAttribute("memberNo") ) );
+		
+    	//페이징 변수에 조회하고자 하는 회원번호(로그인된 회원번호) 대입
     	paging.setMemberno(memberno);
     	
     	//이때 검색기능도 추가할 수 있다.
@@ -452,13 +488,23 @@ public class BoardController {
 		//조회된 리스트를 contentlist라는 프론트단 호출 변수로 모델에 추가
 		model.addAttribute("contentlist", list);
 		
+		return null;
     }
 	
     @GetMapping("/update")
-    public void update(Model model, int boardNo) {
+    public String update(Model model, int boardNo, HttpSession session) {
     	log.info("update() 호출");
+    	
     	//로그인 여부 확인 후 로그인되어 있으면 진행
-    	int memberno = 2; //임시로 회원번호 = 2로 설정하고 개발 진행
+//    	int memberno = 2; //임시로 회원번호 = 2로 설정하고 개발 진행
+		if(String.valueOf(session.getAttribute("islogin")) != "true") {
+			//로그인되어있지 않으면 로그인 화면으로 리다이렉트
+			return "redirect:/member/login";
+		}
+		
+		//세션에서 로그인된 회원번호를 가져온다
+    	int memberno = Integer.parseInt ( String.valueOf ( session.getAttribute("memberNo") ) );
+		
     	log.info("boardNo: {}", boardNo ); //정상적으로 파라미터가 전달된다
     	
     	//전달받은 회원번호 및 게시글번호와 일치하는 게시물 조회
@@ -488,6 +534,7 @@ public class BoardController {
         //조회하고 View로 전달
         // 모델에 filelist 추가(프론트단에서는 filelist로 호출)
         model.addAttribute("filelist", filelist);
+        return null;
     }
     
     @PostMapping("/update")
@@ -510,11 +557,17 @@ public class BoardController {
     }
     
     @GetMapping("/delete")
-    public void delete(Model model, int boardNo) {
+    public String delete(Model model, int boardNo, HttpSession session) {
     	//게시물 삭제
-    	
-    	//임시로 회원번호 = 2로 두고 개발
-    	int memberno = 2;
+    	//로그인 여부 확인 후 로그인되어 있으면 진행
+//    	int memberno = 2; //임시로 회원번호 = 2로 설정하고 개발 진행
+		if(String.valueOf(session.getAttribute("islogin")) != "true") {
+			//로그인되어있지 않으면 로그인 화면으로 리다이렉트
+			return "redirect:/member/login";
+		}
+		
+		//세션에서 로그인된 회원번호를 가져온다
+    	int memberno = Integer.parseInt ( String.valueOf ( session.getAttribute("memberNo") ) );
     	
     	//게시글 삭제를 위해 Content param을 정의하고 회원번호와 게시글번호를 대입
     	Content param = new Content();
@@ -526,6 +579,6 @@ public class BoardController {
     	//게시글 삭제
     	snsService.removeContent( param );
     	
-    	
+    	return "redirect:/main/main";
     }
 }

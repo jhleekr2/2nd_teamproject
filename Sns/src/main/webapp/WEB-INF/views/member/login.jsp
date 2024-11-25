@@ -1,3 +1,5 @@
+<%@ page import="java.util.Date" %>
+
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
@@ -115,6 +117,12 @@
 
 <div class="login-container">
     <h2>로그인</h2>
+    <div class="session-info">
+	세션 아이디 : <%=session.getId() %><br>
+	세션을 생성한 시간 : <%=new Date(session.getCreationTime()) %><br>
+	최근(마지막) 접속한 시간 : <%=new Date(session.getLastAccessedTime()) %><br>
+	</div>
+    
     <form id="loginForm" action="login" method="post">
         <c:if test="${not empty error}">
             <div class="error-message" id="errorMessage">${error}</div>

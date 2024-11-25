@@ -92,4 +92,10 @@ public class MemberServiceImpl implements MemberService {
         // 비밀번호 변경
         return memberDao.updatePassword(memberId, newPassword) > 0;  // 성공 시 1 이상
     }
+
+	@Override
+	public int getMemberno(Login login) {
+		// 로그인 성공시 회원번호 조회
+		return memberDao.getMemberno(login);
+	}
 }

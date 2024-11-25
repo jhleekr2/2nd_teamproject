@@ -245,11 +245,14 @@ body {
 		<div class="user-info-container" onclick="toggleDropdown()">
 			<span class="notification-icon">&#x1F514;</span> <img
 				src="profile.jpg" alt="프로필">
-			<div class="username">사용자 이름</div>
+					세션 아이디 : <%=session.getId() %><br>
+					세션 로그인 회원번호 : ${sessionScope.memberNo}<br>
+					세션 로그인 회원번호 : <%=session.getAttribute("memberNo") %>
+			<div class="username"><%=session.getAttribute("memberID") %>님 안녕하세요</div>
 
 			<!-- 드롭다운 메뉴 -->
 			<div class="dropdown-menu" id="dropdownMenu">
-				<a href="/member/login" onclick="logout()">로그아웃</a>
+				<a href="/member/logout" onclick="logout()">로그아웃</a>
 			</div>
 		</div>
 		<div class="search-bar">
@@ -289,7 +292,7 @@ body {
 			<!-- 댓글 부분은 외부 파일을 새롭게 import 해서 구현할 생각 - 좀더 확장성있고 유연한 구조가 될 것으로 판단한다 -->
 			<!-- 개발이 어느정도 진행된 시점에서 외부파일 import 전략은 오히려 코드의 복잡성만 더하는 실패한 전략으로 결론나고 있다 -->
 			<!-- 당장 AJAX 코드가 예상치못한 치명적인 버그로 인해 JS 코드를 view.jsp로 이관해왔다는 것부터가 이미 실패의 징조 -->
-				<div id="viewComment_${content.boardNo }" class="comment"><c:import url="/main/viewcomment?memberno=2&boardNo=${content.boardNo }"></c:import></div>
+				<div id="viewComment_${content.boardNo }" class="comment"><c:import url="/main/viewcomment?memberno=${sessionScope.memberNo}&boardNo=${content.boardNo }"></c:import></div>
 			</div>
 		</div>
 		</c:forEach>
@@ -314,7 +317,7 @@ body {
         }
 
         function logout() {
-            window.location.href = '/main/main';
+            // window.location.href = '/main/main';
         }
 
         document.addEventListener('click', function(event) {
@@ -386,7 +389,8 @@ body {
             // 추천 버튼 클릭시
             $(".like-btn").on("click", function() {
                 var boardNo = $(this).data("boardno");
-                var memberno = 2;  // 예시로 테스트용 사용자의 번호 2를 설정
+//                 var memberno = 2;  // 예시로 테스트용 사용자의 번호 2를 설정
+                var memberno = <%=session.getAttribute("memberNo") %>;  // 더이상 테스트용 사용자번호를 쓰지 않고, 본격적으로 로그인 정보를 활용
 
                 // AJAX 요청
                 $.ajax({
@@ -432,8 +436,8 @@ body {
         	//AJAX 코드도 중복해서 생성되는 것이 원인으로 밝혀졌다.
         	$(document).on("click", ".comlike-btn", function() {
         		var commentno = $(this).data("commentno");
-        		var memberno = 2; //예시로 테스트용 사용자의 번호 2를 설정
-        		
+//         		var memberno = 2; //예시로 테스트용 사용자의 번호 2를 설정
+        		var memberno = <%=session.getAttribute("memberNo") %>; // 더이상 테스트용 사용자번호를 쓰지 않고, 본격적으로 로그인 정보를 활용
         		// AJAX 요청
         		$.ajax({
         			type: "POST",
@@ -467,8 +471,8 @@ body {
         	$(document).on("click", ".comdel-btn", function() {
                 var boardNo = $(this).data("boardno");
         		var commentno = $(this).data("commentno");
-        		var memberno = 2; //예시로 테스트용 사용자의 번호 2를 설정
-        	
+//         		var memberno = 2; //예시로 테스트용 사용자의 번호 2를 설정
+				var memberno = <%=session.getAttribute("memberNo") %>; // 더이상 테스트용 사용자번호를 쓰지 않고, 본격적으로 로그인 정보를 활용     	
         		// AJAX 요청
         		$.ajax({
         			type: "POST",
@@ -584,7 +588,8 @@ body {
                 
                 var curPage = $(this).attr('data-curpage');  // 페이지 번호 추출
                 var boardNo = $(this).data('boardno');  // 현재 게시물 번호
-                var memberNo = 2;  // 현재 사용자 번호 (임시로 2 설정)
+//                 var memberNo = 2;  // 현재 사용자 번호 (임시로 2 설정)
+                var memberNo = <%=session.getAttribute("memberNo") %>;  // 현재 사용자 번호
                 
                 // AJAX 요청
                 $.ajax({

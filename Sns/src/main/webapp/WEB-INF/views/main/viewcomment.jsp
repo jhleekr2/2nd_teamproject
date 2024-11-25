@@ -75,10 +75,11 @@ ${isCommentRecommendMap }
     
     <input type="hidden" name="boardNo" value="${param.boardNo}">
 <%--     <input type="hidden" name="memberno" value="${param.memberNo}"> --%>
-	<input type="hidden" name="memberno" value=2>
+<!-- 	<input type="hidden" name="memberno" value=2> -->
+	<input type="hidden" name="memberno" value=${sessionScope.memberNo}>
 <!-- 	<input type="hidden" name="memberno" value="2"> 이렇게 하면 memberno가 String 방식으로 전달 -->
 
-	<!-- 사용자 정보는 임시로 2를 전달한다 -->
+	<!-- 사용자 정보는 임시로 2를 전달하는 것으로 개발했으나, 추후 정식으로 세션에서 값을 얻어오는 것으로 수정했음 -->
 	<input type="text" id="upcomment_${param.boardNo }" name="upcomment_${param.boardNo }">
 	<button class="addcomm_${param.boardNo}">댓글 입력</button>
 </form>
