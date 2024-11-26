@@ -132,6 +132,7 @@
         
         <!-- 게시 버튼 -->
         <button>게시</button>
+        <a href="/main/main"><button type="button">취소</button></a>
     </form>
 </div>
 
