@@ -1,4 +1,5 @@
 <%@page import="java.util.Date"%>
+
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
     
@@ -11,15 +12,36 @@
 
 <%-- 현재 시간을 'yyyyMMdd' 형식으로 포맷 --%>
 <fmt:formatDate value="${now}" pattern="yyyyMMdd" var="formattedNow" />
-
+<h3>댓글 뷰 페이지</h3>
+게시글 번호
+<!--  URL 파라미터는 JSP EL과 JSTL로 가져올 수 있음. -->
+<!--  URL 쿼리 파라미터를 EL을 사용하여 직접 가져오려면 param 객체를 사용. -->
+<!--  param 객체는 HTTP 요청의 쿼리 문자열 파라미터를 접근할 수 있게 해주는 내장 객체 -->
+<!--  다른 방법으로 URL 쿼리 파라미터를 가져오려면 URLSearchParams 객체를 사용하거나, -->
+<!--  window.location.search를 파싱하는 방식이 있으며, AJAX의 경우에는 EL JSTL 방식 -->
+<!--  사용이 불가하다는 사실에 주의! -->
+${param.boardNo }
+<hr>
+댓글작성자 닉네임 조회<br>
+${memberMap }
+<hr>
+댓글추천수 조회<br>
+${recommendMap }
+<hr>
+로그인된 사용자의 댓글추천여부 조회<br>
+${isCommentRecommendMap }
 <div class = "comment">
 <table>
 <thead>
 <tr>
+	<th>댓글번호</th>
+	<th>게시물번호</th>
+	<th>작성회원번호</th>
 	<th>작성회원닉</th>
 	<th>작성내용</th>
 	<th>작성날짜</th>
 	<th>추천수</th>
+	<th>추천여부</th>
 	<th>추천/추천취소</th>
 	<th>댓글삭제</th>
 </tr>
@@ -27,21 +49,30 @@
 <tbody>
 <c:forEach var="listcomment" items="${listcomment}">
 <tr>
+	<th>${listcomment.commentno}</th>
+	<th>${listcomment.boardNo}</th>
+	<th>${listcomment.memberno}</th>
 	<th>${memberMap[listcomment.commentno]}</th>
 	<th>${listcomment.content}</th>
 	<th>
-	<%-- 조회 날짜를 다른 Date객체로 설정 --%>
-	<fmt:formatDate var="formattedcommdate" value="${listcomment.date }" pattern="yyyyMMdd"/>
-	<c:choose>
-		<c:when test="${formattedcommdate lt formattedNow }">
-			<fmt:formatDate value="${listcomment.date }" pattern="yyyy-MM-dd"/>
-		</c:when>
-		<c:when test="${formattedcommdate ge formattedNow }">
-			<fmt:formatDate value="${listcomment.date }" pattern="HH:mm"/>
-		</c:when>
-	</c:choose>
+		<%-- 조회 날짜를 다른 Date객체로 설정 --%>
+		<fmt:formatDate var="formattedcommdate" value="${listcomment.date }" pattern="yyyyMMdd"/>
+		
+		날짜 lt비교:${formattedcommdate lt formattedNow }<br>
+		날짜 ge비교:${formattedcommdate ge formattedNow }<br>
+		날짜 now:${formattedNow }<br>
+		비교날짜:${formattedcommdate }<br>
+		<c:choose>
+			<c:when test="${formattedcommdate lt formattedNow }">
+				<fmt:formatDate value="${listcomment.date }" pattern="yyyy-MM-dd"/>
+			</c:when>
+			<c:when test="${formattedcommdate ge formattedNow }">
+				<fmt:formatDate value="${listcomment.date }" pattern="HH:mm"/>
+			</c:when>
+		</c:choose>
 	</th>
 	<th><div id="recommendcomm_${listcomment.commentno }"><h3>${recommendMap[listcomment.commentno] }</h3></div></th>
+	<th>${isCommentRecommendMap[listcomment.commentno] }</th>
 	<th>
 	<div id="isrecommendcomm_${listcomment.commentno }">
 		<h5><a href="javascript:void(0);" class="comlike-btn" data-commentno="${listcomment.commentno}">
@@ -116,3 +147,5 @@
         </c:if>
     </ul>
 </div>
+
+<h3>댓글 마지막</h3>

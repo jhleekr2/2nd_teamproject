@@ -100,6 +100,19 @@
         .upload-container button:hover {
             background-color: #e59c3d;
         }
+        
+        #beforefile {
+        	background-color: #2A2C30;
+        	width: 100%;
+        	height: 40px;
+        	margin-bottom: 20px;
+        	font-size: 24px;
+        }
+        
+        #beforefile span {
+ 			display: inline-block;  /* 또는 block */
+    		text-align: right;
+		}
     </style>
 </head>
 <body>
@@ -154,6 +167,7 @@
   		
         <!-- 게시 버튼 -->
         <button>게시</button>
+        <a href="/main/mycontent"><button type="button">취소</button></a>
     </form>
 </div>
 

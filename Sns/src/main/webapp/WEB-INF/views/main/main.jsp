@@ -10,7 +10,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SNS 페이지</title>
-<style>
+<style type="text/css">
 body {
 	margin: 0;
 	padding: 0;
@@ -236,6 +236,79 @@ body {
 .bottom-menu a:hover {
 	text-decoration: underline;
 }
+
+.addcomment-container button {
+
+	background-color: #F6B352;
+	text-align: center;
+	width: 20%;
+	height: 30px;
+	border-radius: 5px; /* 버튼 및 레이블 모서리 둥글게 */
+	margin-top: 2px;
+	float: right;
+}
+
+.addcomment-container input {
+	width: 75%;
+	height: 15px;
+	padding: 10px;
+	background-color: #383A3F;
+	color: white;
+	border: none;
+	border-radius: 5px; /* 캡션 모서리 약간 둥글게 */
+}
+
+/* 페이지네이션 CSS */
+.paging {
+	display: flex;
+	justify-content: center; /* 페이지네이션을 가로 중앙 정렬 */
+	padding: 20px 0;
+	color: white;
+}
+
+.paging ul {
+	list-style: none; /* 기본 ul의 점 스타일 제거 */
+	margin: 0;
+	padding: 0;
+	display: flex;
+}
+
+.paging li {
+	margin: 0 5px;
+}
+
+.paging a {
+	text-decoration: none;
+	padding: 10px 15px;
+	color: white;
+	border: 1px solid #ddd; /* 기본 테두리 */
+	border-radius: 5px;
+	font-size: 14px;
+	transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* 활성 페이지 스타일 */
+.paging a:hover,
+.paging .active a {
+	background-color: #F6B352;
+	color: white;
+	border-color: #F6B352;
+}
+
+/* 비활성화된 페이지 스타일 (이전/다음 버튼 비활성화) */
+.paging .disabled a {
+	color: #ccc;
+	pointer-events: none;
+	border-color: #ccc;
+}
+
+/* 페이지네이션에 첫 번째 및 마지막 페이지 스타일 */
+.paging .first,
+.paging .last {
+	font-weight: bold;
+}
+
+
 </style>
 <script type="text/javascript" src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 
