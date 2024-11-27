@@ -34,6 +34,14 @@
             font-size: 1.8rem;
         }
 
+		.container table {
+			color: white;
+		    font-size: 1rem;
+		    padding: 1rem;
+		    text-align: center;
+			margin-bottpm: 1rem;
+		}
+		
         .form-control {
             background-color: #2A2C30;
             color: white;
@@ -246,6 +254,7 @@
         </table>
         <button type="submit" id="signupButton" class="btn btn-primary">회원정보수정</button>
         <a href="/main/main"><button type="button" id="backButton" class="btn btn-secondary">메인으로</button></a>
+        <a href="/member/exit"><button type="button" id="backButton" class="btn btn-primary">회원탈퇴</button></a>
     </form>
 </div>
 </body>
