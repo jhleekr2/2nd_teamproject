@@ -153,4 +153,114 @@ public class MemberController {
     	return "redirect:/member/login";
     }
     
+    @GetMapping("/myinfo")
+    public String myinfo(Model model, HttpSession session) {
+    	log.info("회원정보 수정 페이지 요청됨");
+    	// 기존 회원정보 조회
+    	
+		if(String.valueOf(session.getAttribute("islogin")) != "true") {
+			//로그인되어있지 않으면 로그인 화면으로 리다이렉트
+			return "redirect:/member/login";
+		}
+		
+    	// 로그인 중이라면 다음의 코드를 실행
+    	// 세션에서 현재 로그인 중인 회원번호를 호출
+    	int memberno = Integer.parseInt ( String.valueOf ( session.getAttribute("memberNo") ) );
+
+    	// 호출하고 새로운 Member 형식 변수 member에 회원정보를 조회하여 저장
+    	Member member = memberService.findMemberBymemberno(memberno);
+    	
+    	// 저장된 회원정보를 모델에 추가하고 View로 포워딩
+    	model.addAttribute("myinfo", member);
+    	
+    	return "member/myinfo"; // 회원정보 수정 페이지로 이동
+    }
+    @PostMapping("/myinfo")
+    public String myinfoProc(@ModelAttribute Member member, BindingResult result, Model model, HttpSession session) {
+    	//(코드 구현 예정)
+        if (result.hasErrors()) {
+            log.info("회원정보 수정 데이터 바인딩 중 오류 발생: {}", result.getAllErrors());
+            model.addAttribute("error", "잘못된 입력입니다. 다시 시도하세요.");
+            
+        	// 기존 회원정보 조회
+        	// 세션에서 현재 로그인 중인 회원번호를 호출
+        	int memberno = Integer.parseInt ( String.valueOf ( session.getAttribute("memberNo") ) );
+
+        	// 호출하고 새로운 Member 형식 변수 member에 회원정보를 조회하여 저장
+        	member = memberService.findMemberBymemberno(memberno);
+        	
+        	// 저장된 회원정보를 모델에 추가하고 View로 포워딩
+        	model.addAttribute("myinfo", member);
+            return "member/myinfo"; // 바인딩 오류 발생 시 회원정보 수정 페이지로 다시 이동
+        }
+        
+        // 비밀번호 유효성 검사
+        if (!PasswordValidator.isValid(member.getMemberPW())) {
+            model.addAttribute("error",  "비밀번호는 최소 8자 이상, 대문자, 소문자, 숫자, 특수문자를 각각 최소 하나 포함해야 합니다.");
+            
+        	// 기존 회원정보 조회
+        	// 세션에서 현재 로그인 중인 회원번호를 호출
+        	int memberno = Integer.parseInt ( String.valueOf ( session.getAttribute("memberNo") ) );
+
+        	// 호출하고 새로운 Member 형식 변수 member에 회원정보를 조회하여 저장
+        	member = memberService.findMemberBymemberno(memberno);
+        	
+        	// 저장된 회원정보를 모델에 추가하고 View로 포워딩
+        	model.addAttribute("myinfo", member);
+            
+            return "member/myinfo";
+        }
+        
+        // 가입 시간 설정
+//        member.setJoinTime(Timestamp.valueOf(LocalDateTime.now()));
+
+        // 수정하는 회원정보를 세션에서 대입
+        member.setMemberNo(Integer.parseInt ( String.valueOf ( session.getAttribute("memberNo") ) ));
+        try {
+            boolean isSuccess = memberService.myinfo(member);
+            if (isSuccess) {
+            	// 다시 로그인하도록 로그아웃 후 로그인 화면 호출
+            	session.invalidate();
+            	
+                return "redirect:/member/login";
+            } else {
+                model.addAttribute("error", "회원정보 수정에 실패했습니다. 다시 시도해주세요.");
+                
+            	// 기존 회원정보 조회
+            	// 세션에서 현재 로그인 중인 회원번호를 호출
+            	int memberno = Integer.parseInt ( String.valueOf ( session.getAttribute("memberNo") ) );
+
+            	// 호출하고 새로운 Member 형식 변수 member에 회원정보를 조회하여 저장
+            	member = memberService.findMemberBymemberno(memberno);
+            	
+            	// 저장된 회원정보를 모델에 추가하고 View로 포워딩
+            	model.addAttribute("myinfo", member);
+                
+                return "member/myinfo"; // 회원정보 수정 실패 시 다시 회원정보 수정 페이지로 이동
+            }
+        } catch (Exception e) {
+            log.error("회원정보 수정중 예외 발생: ", e);
+            model.addAttribute("error", "회원정보 수정 중 오류가 발생했습니다. 다시 시도해주세요.");
+            
+        	// 기존 회원정보 조회
+        	// 세션에서 현재 로그인 중인 회원번호를 호출
+        	int memberno = Integer.parseInt ( String.valueOf ( session.getAttribute("memberNo") ) );
+
+        	// 호출하고 새로운 Member 형식 변수 member에 회원정보를 조회하여 저장
+        	member = memberService.findMemberBymemberno(memberno);
+        	
+        	// 저장된 회원정보를 모델에 추가하고 View로 포워딩
+        	model.addAttribute("myinfo", member);
+            return "member/myinfo"; // 예외 발생 시에도 회원정보 수정 페이지로 돌아감
+        }
+    }
+    //회원탈퇴
+    //회원정보 삭제 구현
+    @GetMapping("/leave")
+    public String leave(@ModelAttribute Member member, Model model) {
+    	//회원탈퇴(코드 구현 예정)
+    	//- 이때 회원 관련한 모든 정보를 삭제할 생각이지만, 삭제가 어렵다면, 작성한 게시글과 댓글, 추천은 그대로 남겨둘 것이다
+    	
+    	return "main/main";
+    }
 }

@@ -64,17 +64,37 @@
     </select>
     
     <update id="updatePassword" parameterType="map">
-    UPDATE Member
-    SET memberPW = #{newPassword}
-    WHERE memberID = #{memberId}
+	    UPDATE Member
+	    SET memberPW = #{newPassword}
+	    WHERE memberID = #{memberId}
 	</update>
 	
 	<select id="getMemberno" parameterType="view.dto.Login">
 		SELECT memberNo FROM MEMBER
 		<where>
-			memberId = #{memberID}
+			AND memberId = #{memberID}
 		</where>
 	</select>
 
+	<select id="findMemberBymemberno" parameterType="int">
+		SELECT * FROM Member
+		<where>
+			AND memberno = #{memberno}		
+		</where>
+	</select>
+	
+	<update id="myinfo" parameterType="view.dto.Member">
+		UPDATE Member
+		SET 
+		memberPw = #{memberPW},
+		name = #{name},
+		birth_date = #{birthDate},
+		phone = #{phone},
+		nick = #{nick},
+		email = #{email}
+		<where>
+			memberNo = #{memberNo}
+		</where>
+	</update>
 	
 </mapper>

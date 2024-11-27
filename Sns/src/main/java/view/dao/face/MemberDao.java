@@ -72,8 +72,26 @@ public interface MemberDao {
     // 비밀번호 변경
     public int updatePassword(@Param("memberId") String memberId, @Param("newPassword") String newPassword);
 
-    // 로그인 성공시 회원번호 조회
+    /**
+     * 로그인 성공시 회원정보 조회
+     * @param login 로그인 정보
+     * @return 로그인한 회원의 회원번호
+     */
 	public int getMemberno(Login login);
+
+	/**
+	 * 회원번호로 회원정보 조회
+	 * @param memberno 회원번호
+	 * @return 회원정보
+	 */
+	public Member findMemberBymemberno(int memberno);
+
+	/**
+	 * 회원정보 수정
+	 * @param member 회원정보
+	 * @return 회원정보 수정 성공여부
+	 */
+	public boolean myinfo(Member member);
 
 
 

@@ -329,7 +329,8 @@ body {
 			<!-- 드롭다운 메뉴 -->
 			<div class="dropdown-menu" id="dropdownMenu">
 				<c:if test="${sessionScope.islogin }">
-				<a href="/member/logout" onclick="logout()">로그아웃</a>
+				<a href="/member/myinfo">회원정보수정</a>
+				<a href="/member/logout" onclick="logout()">로그아웃</a><br>
 				</c:if>
 				<c:if test="${empty sessionScope.islogin }">
 				<a href="/member/login">로그인</a>
