@@ -3,6 +3,8 @@
 	
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.1/font/bootstrap-icons.css">
+
 <!DOCTYPE html>
 
 <html lang="ko">
@@ -308,6 +310,12 @@ body {
 	font-weight: bold;
 }
 
+img.profile {
+    width: 60px;
+    height: 60px;
+    aspect-ratio: 1 / 1; /* Ensures the image maintains a square aspect ratio */
+    border-radius: 5px; /* Optional: Add rounded corners if desired */
+}
 
 </style>
 <script type="text/javascript" src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
@@ -317,7 +325,7 @@ body {
 	<div class="top-bar">
 		<div class="user-info-container" onclick="toggleDropdown()">
 			<span class="notification-icon">&#x1F514;</span> <img
-				src="profile.jpg" alt="프로필">
+				src="/resources/profile.png" alt="프로필" class=profile>
 					세션 아이디 : <%=session.getId() %><br>
 					세션 로그인 회원번호 : ${sessionScope.memberNo}<br>
 					세션 로그인 회원번호 : <%=session.getAttribute("memberNo") %>
@@ -350,8 +358,9 @@ body {
 				${content.boardNo }
 				</div>
 				<div class="profile-overlay">
-					<img src="profile.jpg" alt="프로필"> <span class="username">사용자
-						${content.memberno }</span>
+					<img src="/resources/profile.png" alt="프로필" class=profile> <span class="username">
+						${nickMap[content.boardNo]}<br>
+						</span>
 				</div>
 				<!-- 파일 출력 부분 -->
                     <c:forEach var="file" items="${fileMap[content.boardNo]}">

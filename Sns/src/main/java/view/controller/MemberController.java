@@ -2,9 +2,11 @@ package view.controller;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import javax.servlet.http.HttpSession;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -17,10 +19,13 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import lombok.extern.slf4j.Slf4j;
-import view.dao.face.MemberDao;
+import view.dto.Comment;
+import view.dto.Commentlike;
+import view.dto.Content;
 import view.dto.Login;
 import view.dto.Member;
 import view.service.face.MemberService;
+import view.service.face.SnsService;
 import view.util.PasswordValidator;
 
 @Controller
@@ -28,11 +33,15 @@ import view.util.PasswordValidator;
 @Slf4j
 public class MemberController {
 
-    private final MemberService memberService;
+//    private final MemberService memberService;
 
-    public MemberController(MemberService memberService) { 
-        this.memberService = memberService;
-    }
+//    public MemberController(MemberService memberService) { 
+//        this.memberService = memberService;
+//    }
+
+    //의존성 객체 주입
+    @Autowired private MemberService memberService;
+    @Autowired private SnsService snsService;
 
     
     @GetMapping("/signup")
@@ -257,10 +266,70 @@ public class MemberController {
     //회원탈퇴
     //회원정보 삭제 구현
     @GetMapping("/leave")
-    public String leave(@ModelAttribute Member member, Model model) {
+    public String leave(Model model, HttpSession session) {
     	//회원탈퇴(코드 구현 예정)
     	//- 이때 회원 관련한 모든 정보를 삭제할 생각이지만, 삭제가 어렵다면, 작성한 게시글과 댓글, 추천은 그대로 남겨둘 것이다
     	
-    	return "main/main";
+       	//로그인 여부 확인 후 로그인되어 있으면 진행
+    	
+		if(String.valueOf(session.getAttribute("islogin")) != "true") {
+			//로그인되어있지 않으면 로그인 화면으로 리다이렉트
+			return "redirect:/member/login";
+		}
+    	
+		//세션에서 로그인된 회원번호를 가져온다
+    	int memberno = Integer.parseInt ( String.valueOf ( session.getAttribute("memberNo") ) );
+		
+    	//댓글 삭제를 위해서 먼저 Comment타입의 DTO변수 하나를 정의한다
+    	Comment param = new Comment();
+    	
+    	//사용자가 작성한 댓글을 조회한다
+    	List<Comment> list = snsService.listComment(memberno);
+
+    	//댓글 추천수 삭제 위해서 Commentlike타입의 DTO변수 하나를 정의한다
+    	Commentlike commentlike = new Commentlike();
+    	
+    	//탈퇴하고자 하는 회원이 추천한 모든 댓글 추천수 삭제
+    	snsService.delRecommendComment(memberno);
+    	
+    	//작성 댓글 조회
+    	log.info("사용자 작성 댓글 : {}", list);
+    	
+    	//foreach문으로 댓글을 하나씩 추출하여 삭제
+    	for(Comment c : list) {
+//    		System.out.println(c);
+    		
+//    		System.out.println(c.getCommentno());
+    		//삭제하고자 하는 댓글 추천수 삭제
+    		
+    		//댓글번호 commentlike에 대입
+//    		commentlike.setCommentno(c.getCommentno());
+    		//사용자번호 commentlike에 대입
+//    		commentlike.setMemberno(memberno);
+    		
+    		//작성 댓글 삭제(삭제하고자 하는 댓글 추천수 삭제 포함)
+    		snsService.delComment(c);
+    	}
+    	
+    	//작성 게시글 삭제
+    	
+    	//탈퇴하고자 하는 회원이 추천한 모든 게시글 추천수 삭제
+    	snsService.delRecommend(memberno);
+    	
+    	//게시글을 삭제하기 위해 작성한 게시글 목록 조회
+    	List<Content> list2 = snsService.listmember( memberno );
+    	
+    	//foreach문으로 게시글을 하나씩 추출하여 삭제
+    	for( Content c : list2 ) {
+    		snsService.removeContent(c);
+    	}
+    	
+    	//회원정보 삭제
+    	memberService.leave(memberno);
+    	
+    	//로그아웃
+    	session.invalidate();
+    	//메인 화면으로 리턴
+    	return "redirect:/main/main";
     }
 }

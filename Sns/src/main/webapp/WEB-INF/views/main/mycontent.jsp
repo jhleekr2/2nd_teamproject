@@ -22,6 +22,33 @@
 <title>Insert title here</title>
 </head>
 <style type="text/css">
+
+.top-bar {
+	background-color: #FFBC42;
+	padding: 8px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	position: fixed;
+	top: 0;
+	width: 100%;
+	z-index: 10;
+	height: 70px;
+	gap: 15px;
+}
+
+.content-wrapper {
+    display: flex;
+    justify-content: center; /* 가로 방향으로 중앙 정렬 */
+    align-items: center;     /* 세로 방향으로 중앙 정렬 */
+    margin-top: 100px;       /* 상단 바의 높이에 맞게 여백을 설정 */
+}
+
+
+table {
+	
+}
+
 /* 페이지네이션 CSS */
 .paging {
 	display: flex;
@@ -72,12 +99,33 @@
 	font-weight: bold;
 }
 
+.bottom-menu {
+	position: fixed;
+	bottom: 0;
+	width: 100%;
+	background-color: #E0E3DA;
+	padding: 10px;
+	display: flex;
+	justify-content: center;
+	gap: 30px;
+	box-shadow: 0 -4px 8px rgba(0, 0, 0, 0.2);
+	z-index: 5;
+}
 
+.bottom-menu a {
+	color: #1F2124;
+	text-decoration: none;
+	font-size: 18px;
+}
+
+.bottom-menu a:hover {
+	text-decoration: underline;
+}
 </style>
 <body>
+<div class="top-bar">
 <h3>작성한 게시글</h3>
-<hr>
-
+</div>
 <div class="content-wrapper" id="contentWrapper">
 <table>
 <thead>
@@ -131,7 +179,6 @@
 </div>
 
 <div class="paging">
-<div>
 
 <ul class="pagination justify-content-center">
 
@@ -181,6 +228,16 @@
 
 </div>
 
+<div class="bottom-menu">
+<i class="bi bi-house">홈</i>
+	<a href="/main/main">메인으로</a> 
+	<i class="bi bi-chat-left-text"><a href="#">메세지</a> </i>
+	<a href="upload">게시물 작성</a> 
+	<a href="mycontent">게시물 수정</a>
+	<!-- 게시물 수정 페이지는 본인이 작성한 게시물을 최근 순으로 조회한 다음에 수정 페이지를 따로 두어 -->
+	<!-- 게시물을 수정하는 인터페이스를 띄우고, 수정하면 업데이트 가능 -->
+	<!-- 게시물 삭제는 게시물 수정 페이지에서 같이 구현 -->
+	<a href="#">설정</a>
 </div>
 </body>
 </html>

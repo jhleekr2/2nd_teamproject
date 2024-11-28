@@ -111,4 +111,11 @@ public class MemberServiceImpl implements MemberService {
 		return memberDao.myinfo(member);
 	}
 
+	@Override
+	public void leave(int memberno) {
+		// 회원 탈퇴
+		memberDao.leave(memberno);
+		
+	}
+
 }

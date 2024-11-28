@@ -66,8 +66,10 @@ public interface SnsService {
 	/**
 	 * 게시글 추천수 제거
 	 * @param recommend 추천수 제거하고자 하는 게시글 번호와 회원정보
+	 * @param memberno 추천수 제거하고자 하는 회원정보
 	 */
 	public void delRecommend(Recommend recommend);
+	public void delRecommend(int memberno);
 
 	/**
 	 * 게시물의 댓글 조회
@@ -110,9 +112,11 @@ public interface SnsService {
 	/**
 	 * 댓글 추천수 삭제
 	 * @param commentlike 삭제하고자 하는 댓글 번호와 로그인된 회원번호
+	 * @param memberno 사용자가 추천한 댓글 추천수 모두 삭제
 	 */
 	public void delRecommendComment(Commentlike commentlike);
-
+	public void delRecommendComment(int memberno);
+	
 	/**
 	 * 댓글 추가
 	 * @param param 추가하고자 하는 댓글의 정보
@@ -174,11 +178,11 @@ public interface SnsService {
 	 */
 	public Pagingcomm getPagingComm(Pagingcomm paging);
 
-
-
-
-
-
-
+	/**
+	 * 사용자가 작성한 댓글 목록을 조회한다
+	 * @param memberno 조회할 사용자 번호
+	 * @return 작성된 댓글 목록
+	 */
+	public List<Comment> listComment(int memberno);
 
 }

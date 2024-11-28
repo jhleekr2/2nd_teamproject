@@ -97,4 +97,10 @@
 		</where>
 	</update>
 	
+	<delete id="leave" parameterType="int">
+		DELETE FROM Member
+		<where>
+			memberNo = #{memberNo}
+		</where>		
+	</delete>
 </mapper>

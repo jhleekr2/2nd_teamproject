@@ -93,6 +93,12 @@ public interface MemberDao {
 	 */
 	public boolean myinfo(Member member);
 
+	/**
+	 * 회원 탈퇴
+	 * @param memberno 탈퇴할 회원번호
+	 */
+	public void leave(int memberno);
+
 
 
 }

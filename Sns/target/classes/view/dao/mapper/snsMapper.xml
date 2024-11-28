@@ -127,6 +127,13 @@
 		</where>
 	</delete>
 	
+	<delete id="delRecommendCommentbyMember" parameterType="int">
+		DELETE FROM COMMENTLIKE
+		<where>
+			AND memberno = #{memberno}
+		</where>
+	</delete>
+	
 	<insert id="addComment" parameterType="view.dto.Comment">
 		<selectKey order="BEFORE" resultType="int" keyProperty="commentno">
 			SELECT comment_seq.nextval FROM dual
@@ -240,4 +247,18 @@
 			</if>
 		</where>
 	</select>
+	
+	<select id="listComment" parameterType="int">
+		SELECT * FROM "Comment"
+		<where>
+			AND memberno = #{memberno}
+		</where>
+	</select>
+	
+	<delete id="delRecommendbyMember" parameterType="int">
+		DELETE FROM RECOMMEND
+		<where>
+			AND memberno = #{memberno}
+		</where>
+	</delete>
 </mapper>    

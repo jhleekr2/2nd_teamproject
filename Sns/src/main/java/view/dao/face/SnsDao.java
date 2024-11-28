@@ -120,6 +120,12 @@ public interface SnsDao {
 	 * @param commentlike 추천수 삭제하려는 댓글번호와 로그인된 회원번호
 	 */
 	public void delRecommendComment(Commentlike commentlike);
+	
+	/**
+	 * 댓글 추천수 삭제
+	 * @param memberno 로그인된 사용자가 추천한 모든 댓글 추천수 삭제
+	 */
+	public void delRecommendCommentbyMember(int memberno);
 
 	/**
 	 * 댓글 추가
@@ -205,6 +211,20 @@ public interface SnsDao {
 	 * @return 조건을 만족하는 댓글의 개수
 	 */
 	public int selectCntAllComm(int boardNo);
+
+	/**
+	 * 사용자가 작성한 댓글 목록 조회
+	 * @param memberno 작성자 회원번호
+	 * @return 작성한 댓글 목록
+	 */
+	public List<Comment> listComment(int memberno);
+
+	/**
+	 * 사용자가 추천한 모든 게시글 추천내역 삭제
+	 * @param memberno 회원번호
+	 */
+	public void delRecommendbyMember(int memberno);
+
 
 
 
