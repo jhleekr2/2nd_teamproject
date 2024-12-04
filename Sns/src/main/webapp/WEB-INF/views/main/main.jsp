@@ -413,8 +413,8 @@ img.profile {
 	<i class="bi bi-house">홈</i>
 		<a href="#">홈</a> 
 		<i class="bi bi-chat-left-text"><a href="#">채팅</a> </i>
-		<a href="upload">게시물 작성</a> 
-		<a href="mycontent">게시물 수정</a>
+		<a href="/main/upload">게시물 작성</a> 
+		<a href="/main/mycontent">게시물 수정</a>
 		<!-- 게시물 수정 페이지는 본인이 작성한 게시물을 최근 순으로 조회한 다음에 수정 페이지를 따로 두어 -->
 		<!-- 게시물을 수정하는 인터페이스를 띄우고, 수정하면 업데이트 가능 -->
 		<!-- 게시물 삭제는 게시물 수정 페이지에서 같이 구현 -->
