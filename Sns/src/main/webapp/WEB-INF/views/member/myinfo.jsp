@@ -199,6 +199,19 @@
 	            });
             }	
         }
+        
+        function leave() {
+        	
+        	console.log("leave");	
+        	
+            // 경고창 띄우기
+            var confirmLeave = confirm("탈퇴하겠습니까? 탈퇴는 되돌릴 수 없으며, 모든 관련 자료가 삭제됩니다.");
+        	
+       		if(confirmLeave) {
+       		 	window.location.href = "/member/leave"; // 실제 회원탈퇴 링크로 이동
+   	    	}
+        };
+        
     </script>
 </head>
 <body>
@@ -254,7 +267,8 @@
         </table>
         <button type="submit" id="signupButton" class="btn btn-primary">회원정보수정</button>
         <a href="/main/main"><button type="button" id="backButton" class="btn btn-secondary">메인으로</button></a>
-        <a href="/member/leave"><button type="button" id="backButton" class="btn btn-primary">회원탈퇴</button></a>
+<!--         <a href="/member/leave" id="leave"><button type="button" id="backButton" class="btn btn-primary">회원탈퇴</button></a> -->
+        <button type="button" id="backButton" class="btn btn-primary" onclick="leave()">회원탈퇴</button>
     </form>
 </div>
 </body>

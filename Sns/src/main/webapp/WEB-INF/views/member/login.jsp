@@ -118,9 +118,9 @@
 <div class="login-container">
     <h2>로그인</h2>
     <div class="session-info">
-	세션 아이디 : <%=session.getId() %><br>
-	세션을 생성한 시간 : <%=new Date(session.getCreationTime()) %><br>
-	최근(마지막) 접속한 시간 : <%=new Date(session.getLastAccessedTime()) %><br>
+<%-- 	세션 아이디 : <%=session.getId() %><br> --%>
+<%-- 	세션을 생성한 시간 : <%=new Date(session.getCreationTime()) %><br> --%>
+<%-- 	최근(마지막) 접속한 시간 : <%=new Date(session.getLastAccessedTime()) %><br> --%>
 	</div>
     
     <form id="loginForm" action="login" method="post">

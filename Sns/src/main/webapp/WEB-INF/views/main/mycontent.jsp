@@ -35,6 +35,7 @@
 	z-index: 10;
 	height: 70px;
 	gap: 15px;
+	font-size: 24px;
 }
 
 .content-wrapper {
@@ -46,7 +47,7 @@
 
 
 table {
-	
+	font-size: 20px;
 }
 
 /* 페이지네이션 CSS */
@@ -231,13 +232,13 @@ table {
 <div class="bottom-menu">
 <i class="bi bi-house">홈</i>
 	<a href="/main/main">메인으로</a> 
-	<i class="bi bi-chat-left-text"><a href="#">메세지</a> </i>
+	<i class="bi bi-chat-left-text"><a href="#">채팅</a> </i>
 	<a href="upload">게시물 작성</a> 
 	<a href="mycontent">게시물 수정</a>
 	<!-- 게시물 수정 페이지는 본인이 작성한 게시물을 최근 순으로 조회한 다음에 수정 페이지를 따로 두어 -->
 	<!-- 게시물을 수정하는 인터페이스를 띄우고, 수정하면 업데이트 가능 -->
 	<!-- 게시물 삭제는 게시물 수정 페이지에서 같이 구현 -->
-	<a href="#">설정</a>
+<!-- 	<a href="#">설정</a> -->
 </div>
 </body>
 </html>
