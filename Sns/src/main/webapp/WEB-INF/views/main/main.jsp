@@ -3,6 +3,8 @@
 	
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.1/font/bootstrap-icons.css">
+
 <!DOCTYPE html>
 
 <html lang="ko">
@@ -308,7 +310,26 @@ body {
 	font-weight: bold;
 }
 
+img.profile {
+    width: 60px;
+    height: 60px;
+    aspect-ratio: 1 / 1; /* Ensures the image maintains a square aspect ratio */
+    border-radius: 5px; /* Optional: Add rounded corners if desired */
+}
 
+.boardno {
+	color: #FFFFFF;
+	font-size: 30px;
+}
+
+.search-bar {
+	color: white;
+	font-size: 30px;
+}
+
+.post-content {
+	font-size: 24px;
+}
 </style>
 <script type="text/javascript" src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 
@@ -317,10 +338,10 @@ body {
 	<div class="top-bar">
 		<div class="user-info-container" onclick="toggleDropdown()">
 			<span class="notification-icon">&#x1F514;</span> <img
-				src="profile.jpg" alt="프로필">
-					세션 아이디 : <%=session.getId() %><br>
-					세션 로그인 회원번호 : ${sessionScope.memberNo}<br>
-					세션 로그인 회원번호 : <%=session.getAttribute("memberNo") %>
+				src="/resources/profile.png" alt="프로필" class=profile>
+<%-- 					세션 아이디 : <%=session.getId() %><br> --%>
+<%-- 					세션 로그인 회원번호 : ${sessionScope.memberNo}<br> --%>
+<%-- 					세션 로그인 회원번호 : <%=session.getAttribute("memberNo") %> --%>
 			<div class="username">
 			<c:if test="${sessionScope.islogin }"><%=session.getAttribute("memberID") %>님 안녕하세요</c:if>
 			<c:if test="${empty sessionScope.islogin }">로그인하세요</c:if>
@@ -329,7 +350,8 @@ body {
 			<!-- 드롭다운 메뉴 -->
 			<div class="dropdown-menu" id="dropdownMenu">
 				<c:if test="${sessionScope.islogin }">
-				<a href="/member/logout" onclick="logout()">로그아웃</a>
+				<a href="/member/myinfo">회원정보수정</a>
+				<a href="/member/logout" onclick="logout()">로그아웃</a><br>
 				</c:if>
 				<c:if test="${empty sessionScope.islogin }">
 				<a href="/member/login">로그인</a>
@@ -337,7 +359,9 @@ body {
 			</div>
 		</div>
 		<div class="search-bar">
-			<input type="text" placeholder="검색...">
+<!-- 			<input type="text" placeholder="검색..."> -->
+<!-- 			검색기능을 제외하고 프로젝트 이름을 적자	 -->
+			Project S
 		</div>
 	</div>
 
@@ -346,11 +370,13 @@ body {
 		<div class="post">
 			<div class="left-section">
 				<div class="boardNo">
-				${content.boardNo }
+<%-- 				${content.boardNo } --%>
+					${content.title }
 				</div>
 				<div class="profile-overlay">
-					<img src="profile.jpg" alt="프로필"> <span class="username">사용자
-						${content.memberno }</span>
+					<img src="/resources/profile.png" alt="프로필" class=profile> <span class="username">
+						${nickMap[content.boardNo]}<br>
+						</span>
 				</div>
 				<!-- 파일 출력 부분 -->
                     <c:forEach var="file" items="${fileMap[content.boardNo]}">
@@ -359,13 +385,16 @@ body {
 <%-- 						<a href="./image?fileno=${file.fileno }">이미지</a> --%>
 						<img src="/main/image?fileno=${file.fileno }">
     				</c:forEach>	
-				<img src="image_placeholder.jpg" alt="사진">
+<!-- 				<img src="image_placeholder.jpg" alt="사진"> -->
+					<div class="post-content">
+					${content.content }
+					</div>
 				<div class="post-actions">
 					<!-- 추천할때 테스트용으로 회원번호 2번으로 테스트 넣음 -->
 <%-- 					<a href="./recommend?memberno=2&boardNo=${content.boardNo}"/> --%>
 					<a href="javascript:void(0);" class="like-btn" data-boardno="${content.boardNo}">
 					<div id="isRecommend_${content.boardNo}"><span>${recommendMap[content.boardNo] == 1 ? '❤️ 좋아요 취소' : '❤️ 좋아요'}</span></div></a>
-                    <span>💬 댓글</span> <div id="recommendNo_${content.boardNo}"><span>${numberofRecommend[content.boardNo] }</span></div>
+                    <span>추천수</span> <div id="recommendNo_${content.boardNo}"><span>${numberofRecommend[content.boardNo] }</span></div>
 					
 				</div>
 			</div>
@@ -373,6 +402,7 @@ body {
 			<!-- 댓글 부분은 외부 파일을 새롭게 import 해서 구현할 생각 - 좀더 확장성있고 유연한 구조가 될 것으로 판단한다 -->
 			<!-- 개발이 어느정도 진행된 시점에서 외부파일 import 전략은 오히려 코드의 복잡성만 더하는 실패한 전략으로 결론나고 있다 -->
 			<!-- 당장 AJAX 코드가 예상치못한 치명적인 버그로 인해 JS 코드를 view.jsp로 이관해왔다는 것부터가 이미 실패의 징조 -->
+			<!-- 어찌저찌 구현에 성공했고 테스트 완료했음 -->
 				<div id="viewComment_${content.boardNo }" class="comment"><c:import url="/main/viewcomment?memberno=${sessionScope.memberNo}&boardNo=${content.boardNo }"></c:import></div>
 			</div>
 		</div>
@@ -382,13 +412,13 @@ body {
 	<div class="bottom-menu">
 	<i class="bi bi-house">홈</i>
 		<a href="#">홈</a> 
-		<i class="bi bi-chat-left-text"><a href="#">메세지</a> </i>
+		<i class="bi bi-chat-left-text"><a href="#">채팅</a> </i>
 		<a href="upload">게시물 작성</a> 
 		<a href="mycontent">게시물 수정</a>
 		<!-- 게시물 수정 페이지는 본인이 작성한 게시물을 최근 순으로 조회한 다음에 수정 페이지를 따로 두어 -->
 		<!-- 게시물을 수정하는 인터페이스를 띄우고, 수정하면 업데이트 가능 -->
 		<!-- 게시물 삭제는 게시물 수정 페이지에서 같이 구현 -->
-		<a href="#">설정</a>
+<!-- 		<a href="#">설정</a> -->
 	</div>
 
 	<script>

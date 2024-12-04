@@ -98,4 +98,24 @@ public class MemberServiceImpl implements MemberService {
 		// 로그인 성공시 회원번호 조회
 		return memberDao.getMemberno(login);
 	}
+
+	@Override
+	public Member findMemberBymemberno(int memberno) {
+		// 회원번호로 회원정보 조회
+		return memberDao.findMemberBymemberno(memberno);
+	}
+
+	@Override
+	public boolean myinfo(Member member) {
+		// 회원정보 수정
+		return memberDao.myinfo(member);
+	}
+
+	@Override
+	public void leave(int memberno) {
+		// 회원 탈퇴
+		memberDao.leave(memberno);
+		
+	}
+
 }

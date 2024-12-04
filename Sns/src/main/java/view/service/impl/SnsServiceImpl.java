@@ -261,10 +261,15 @@ public class SnsServiceImpl implements SnsService {
 
 	@Override
 	public void delRecommendComment(Commentlike commentlike) {
-		// 댓글 추천수 삭제
+		// 댓글 추천수 삭제(사용자 번호화 댓글 번호가 모두 일치하는 경우만)
 		snsDao.delRecommendComment(commentlike);
 	}
 
+	@Override
+	public void delRecommendComment(int memberno) {
+		// 댓글 추천수 삭제(사용자가 추천한 모든 추천에 해당)
+		snsDao.delRecommendCommentbyMember(memberno);
+	}
 	@Override
 	public void addComment(Comment param) {
 		// 댓글 추가
@@ -536,6 +541,19 @@ public class SnsServiceImpl implements SnsService {
 		Pagingcomm paging2 = new Pagingcomm(curPage, totalCount, boardNo);
 		return paging2;
 	}
+
+	@Override
+	public List<Comment> listComment(int memberno) {
+		// 사용자가 작성한 댓글 목록 조회
+		return snsDao.listComment(memberno);
+	}
+
+	@Override
+	public void delRecommend(int memberno) {
+		// 사용자가 추천한 모든 게시글 추천내역 삭제
+		snsDao.delRecommendbyMember(memberno);
+	}
+
 
 
 }

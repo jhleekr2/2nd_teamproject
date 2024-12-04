@@ -83,4 +83,13 @@ public interface MemberService {
     // 로그인 성공시 회원번호 조회
 	public int getMemberno(Login login);
 
+	// 회원번호로 회원정보 조회
+	public Member findMemberBymemberno(int memberno);
+	
+	// 회원정보 수정
+	public boolean myinfo(Member member);
+
+	// 회원 탈퇴
+	public void leave(int memberno);
+
 }

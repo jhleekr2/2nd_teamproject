@@ -21,10 +21,12 @@ import view.dto.Commentlike;
 import view.dto.Content;
 import view.dto.ContentFile;
 import view.dto.Fileparam;
+import view.dto.Member;
 import view.dto.Paging;
 import view.dto.Pagingcomm;
 import view.dto.Recommend;
 import view.dto.RecommendInfo;
+import view.service.face.MemberService;
 import view.service.face.SnsService;
 
 @RequestMapping("/main")
@@ -33,8 +35,9 @@ import view.service.face.SnsService;
 public class BoardController {
 
 	//서비스 객체 의존성 주입
-	@Autowired 
-	private SnsService snsService;
+	@Autowired private SnsService snsService;
+	@Autowired private MemberService memberService;
+	
 	@GetMapping("/main")
 	public void mainPage(Content content, Model model, HttpSession session) {
 		log.info("mainPage() 호출");
@@ -49,6 +52,9 @@ public class BoardController {
     	//랜덤한 게시글 목록 조회
     	List<Content> list = snsService.list();
 		
+    	// 게시글 작성자 닉네임을 저장할 Map
+    	Map<Integer, String> nickMap = new HashMap<>();
+    	
     	// 파일 리스트를 저장할 Map
         Map<Integer, List<ContentFile>> fileMap = new HashMap<>();
 
@@ -65,6 +71,12 @@ public class BoardController {
             
     		//조회된 리스트를 contentlist라는 프론트단 호출 변수로 모델에 추가
     		model.addAttribute("contentlist", list);
+    		
+    		// 게시물 번호에 맞는 회원번호를 통해 게시글 작성자 닉네임을 조회
+    		Member creaternick = memberService.findMemberBymemberno(c.getMemberno());
+    		
+    		// 게시물 번호를 키로 하고 작성자 닉네임을 값으로 추가
+    		nickMap.put(c.getBoardNo(), creaternick.getNick());
     		
             // 게시물 번호에 맞는 업로드된 파일을 조회
             List<ContentFile> filelist = snsService.viewPhoto(c);
@@ -113,6 +125,7 @@ public class BoardController {
 //            // 모델에 RecommendMap 추가
 //            model.addAttribute("numberofRecommend", RecommendMap);
         }
+        
         // 모델에 isRecommendMap 추가
         model.addAttribute("recommendMap", isRecommendMap);
         // 모델에 RecommendMap 추가
@@ -121,6 +134,8 @@ public class BoardController {
         // 모델에 fileMap 추가                 
         model.addAttribute("fileMap", fileMap);
         
+        // 모델에 nickMap 추가
+        model.addAttribute("nickMap", nickMap);
 //	    return "main/main"; // main/main.jsp로 이동
 	}
 	
@@ -579,6 +594,7 @@ public class BoardController {
     	//게시글 삭제
     	snsService.removeContent( param );
     	
+    	//메인 화면으로 이동
     	return "redirect:/main/main";
     }
 }

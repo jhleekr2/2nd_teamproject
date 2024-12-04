@@ -2,9 +2,11 @@ package view.controller;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import javax.servlet.http.HttpSession;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -17,10 +19,13 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import lombok.extern.slf4j.Slf4j;
-import view.dao.face.MemberDao;
+import view.dto.Comment;
+import view.dto.Commentlike;
+import view.dto.Content;
 import view.dto.Login;
 import view.dto.Member;
 import view.service.face.MemberService;
+import view.service.face.SnsService;
 import view.util.PasswordValidator;
 
 @Controller
@@ -28,11 +33,15 @@ import view.util.PasswordValidator;
 @Slf4j
 public class MemberController {
 
-    private final MemberService memberService;
+//    private final MemberService memberService;
 
-    public MemberController(MemberService memberService) { 
-        this.memberService = memberService;
-    }
+//    public MemberController(MemberService memberService) { 
+//        this.memberService = memberService;
+//    }
+
+    //의존성 객체 주입
+    @Autowired private MemberService memberService;
+    @Autowired private SnsService snsService;
 
     
     @GetMapping("/signup")
@@ -153,4 +162,174 @@ public class MemberController {
     	return "redirect:/member/login";
     }
     
+    @GetMapping("/myinfo")
+    public String myinfo(Model model, HttpSession session) {
+    	log.info("회원정보 수정 페이지 요청됨");
+    	// 기존 회원정보 조회
+    	
+		if(String.valueOf(session.getAttribute("islogin")) != "true") {
+			//로그인되어있지 않으면 로그인 화면으로 리다이렉트
+			return "redirect:/member/login";
+		}
+		
+    	// 로그인 중이라면 다음의 코드를 실행
+    	// 세션에서 현재 로그인 중인 회원번호를 호출
+    	int memberno = Integer.parseInt ( String.valueOf ( session.getAttribute("memberNo") ) );
+
+    	// 호출하고 새로운 Member 형식 변수 member에 회원정보를 조회하여 저장
+    	Member member = memberService.findMemberBymemberno(memberno);
+    	
+    	// 저장된 회원정보를 모델에 추가하고 View로 포워딩
+    	model.addAttribute("myinfo", member);
+    	
+    	return "member/myinfo"; // 회원정보 수정 페이지로 이동
+    }
+    @PostMapping("/myinfo")
+    public String myinfoProc(@ModelAttribute Member member, BindingResult result, Model model, HttpSession session) {
+    	//(코드 구현 예정)
+        if (result.hasErrors()) {
+            log.info("회원정보 수정 데이터 바인딩 중 오류 발생: {}", result.getAllErrors());
+            model.addAttribute("error", "잘못된 입력입니다. 다시 시도하세요.");
+            
+        	// 기존 회원정보 조회
+        	// 세션에서 현재 로그인 중인 회원번호를 호출
+        	int memberno = Integer.parseInt ( String.valueOf ( session.getAttribute("memberNo") ) );
+
+        	// 호출하고 새로운 Member 형식 변수 member에 회원정보를 조회하여 저장
+        	member = memberService.findMemberBymemberno(memberno);
+        	
+        	// 저장된 회원정보를 모델에 추가하고 View로 포워딩
+        	model.addAttribute("myinfo", member);
+            return "member/myinfo"; // 바인딩 오류 발생 시 회원정보 수정 페이지로 다시 이동
+        }
+        
+        // 비밀번호 유효성 검사
+        if (!PasswordValidator.isValid(member.getMemberPW())) {
+            model.addAttribute("error",  "비밀번호는 최소 8자 이상, 대문자, 소문자, 숫자, 특수문자를 각각 최소 하나 포함해야 합니다.");
+            
+        	// 기존 회원정보 조회
+        	// 세션에서 현재 로그인 중인 회원번호를 호출
+        	int memberno = Integer.parseInt ( String.valueOf ( session.getAttribute("memberNo") ) );
+
+        	// 호출하고 새로운 Member 형식 변수 member에 회원정보를 조회하여 저장
+        	member = memberService.findMemberBymemberno(memberno);
+        	
+        	// 저장된 회원정보를 모델에 추가하고 View로 포워딩
+        	model.addAttribute("myinfo", member);
+            
+            return "member/myinfo";
+        }
+        
+        // 가입 시간 설정
+//        member.setJoinTime(Timestamp.valueOf(LocalDateTime.now()));
+
+        // 수정하는 회원정보를 세션에서 대입
+        member.setMemberNo(Integer.parseInt ( String.valueOf ( session.getAttribute("memberNo") ) ));
+        try {
+            boolean isSuccess = memberService.myinfo(member);
+            if (isSuccess) {
+            	// 다시 로그인하도록 로그아웃 후 로그인 화면 호출
+            	session.invalidate();
+            	
+                return "redirect:/member/login";
+            } else {
+                model.addAttribute("error", "회원정보 수정에 실패했습니다. 다시 시도해주세요.");
+                
+            	// 기존 회원정보 조회
+            	// 세션에서 현재 로그인 중인 회원번호를 호출
+            	int memberno = Integer.parseInt ( String.valueOf ( session.getAttribute("memberNo") ) );
+
+            	// 호출하고 새로운 Member 형식 변수 member에 회원정보를 조회하여 저장
+            	member = memberService.findMemberBymemberno(memberno);
+            	
+            	// 저장된 회원정보를 모델에 추가하고 View로 포워딩
+            	model.addAttribute("myinfo", member);
+                
+                return "member/myinfo"; // 회원정보 수정 실패 시 다시 회원정보 수정 페이지로 이동
+            }
+        } catch (Exception e) {
+            log.error("회원정보 수정중 예외 발생: ", e);
+            model.addAttribute("error", "회원정보 수정 중 오류가 발생했습니다. 다시 시도해주세요.");
+            
+        	// 기존 회원정보 조회
+        	// 세션에서 현재 로그인 중인 회원번호를 호출
+        	int memberno = Integer.parseInt ( String.valueOf ( session.getAttribute("memberNo") ) );
+
+        	// 호출하고 새로운 Member 형식 변수 member에 회원정보를 조회하여 저장
+        	member = memberService.findMemberBymemberno(memberno);
+        	
+        	// 저장된 회원정보를 모델에 추가하고 View로 포워딩
+        	model.addAttribute("myinfo", member);
+            return "member/myinfo"; // 예외 발생 시에도 회원정보 수정 페이지로 돌아감
+        }
+    }
+    //회원탈퇴
+    //회원정보 삭제 구현
+    @GetMapping("/leave")
+    public String leave(Model model, HttpSession session) {
+    	//회원탈퇴(코드 구현 예정)
+    	//- 이때 회원 관련한 모든 정보를 삭제할 생각이지만, 삭제가 어렵다면, 작성한 게시글과 댓글, 추천은 그대로 남겨둘 것이다
+    	
+       	//로그인 여부 확인 후 로그인되어 있으면 진행
+    	
+		if(String.valueOf(session.getAttribute("islogin")) != "true") {
+			//로그인되어있지 않으면 로그인 화면으로 리다이렉트
+			return "redirect:/member/login";
+		}
+    	
+		//세션에서 로그인된 회원번호를 가져온다
+    	int memberno = Integer.parseInt ( String.valueOf ( session.getAttribute("memberNo") ) );
+		
+    	//댓글 삭제를 위해서 먼저 Comment타입의 DTO변수 하나를 정의한다
+    	Comment param = new Comment();
+    	
+    	//사용자가 작성한 댓글을 조회한다
+    	List<Comment> list = snsService.listComment(memberno);
+
+    	//댓글 추천수 삭제 위해서 Commentlike타입의 DTO변수 하나를 정의한다
+    	Commentlike commentlike = new Commentlike();
+    	
+    	//탈퇴하고자 하는 회원이 추천한 모든 댓글 추천수 삭제
+    	snsService.delRecommendComment(memberno);
+    	
+    	//작성 댓글 조회
+    	log.info("사용자 작성 댓글 : {}", list);
+    	
+    	//foreach문으로 댓글을 하나씩 추출하여 삭제
+    	for(Comment c : list) {
+//    		System.out.println(c);
+    		
+//    		System.out.println(c.getCommentno());
+    		//삭제하고자 하는 댓글 추천수 삭제
+    		
+    		//댓글번호 commentlike에 대입
+//    		commentlike.setCommentno(c.getCommentno());
+    		//사용자번호 commentlike에 대입
+//    		commentlike.setMemberno(memberno);
+    		
+    		//작성 댓글 삭제(삭제하고자 하는 댓글 추천수 삭제 포함)
+    		snsService.delComment(c);
+    	}
+    	
+    	//작성 게시글 삭제
+    	
+    	//탈퇴하고자 하는 회원이 추천한 모든 게시글 추천수 삭제
+    	snsService.delRecommend(memberno);
+    	
+    	//게시글을 삭제하기 위해 작성한 게시글 목록 조회
+    	List<Content> list2 = snsService.listmember( memberno );
+    	
+    	//foreach문으로 게시글을 하나씩 추출하여 삭제
+    	for( Content c : list2 ) {
+    		snsService.removeContent(c);
+    	}
+    	
+    	//회원정보 삭제
+    	memberService.leave(memberno);
+    	
+    	//로그아웃
+    	session.invalidate();
+    	//메인 화면으로 리턴
+    	return "redirect:/main/main";
+    }
 }
