@@ -232,7 +232,7 @@ table {
 <div class="bottom-menu">
 <i class="bi bi-house">홈</i>
 	<a href="/main/main">메인으로</a> 
-	<i class="bi bi-chat-left-text"><a href="#">채팅</a> </i>
+	<i class="bi bi-chat-left-text"><a href="javascript:void(0);" onclick="window.open('/socket/chat', 'chat', 'width=648, height=816')">채팅</a> </i>
 	<a href="upload">게시물 작성</a> 
 	<a href="mycontent">게시물 수정</a>
 	<!-- 게시물 수정 페이지는 본인이 작성한 게시물을 최근 순으로 조회한 다음에 수정 페이지를 따로 두어 -->
