@@ -25,7 +25,7 @@ html, body {
 
 	#main {
 		width: 648px;
-		height: 816px;
+		height: 750px;
 		margin: 3px;
 		display: grid;
 		grid-template-rows: repeat(12, 1fr);
@@ -144,7 +144,10 @@ html, body {
 
 	let name;
 	let ws;
-	const url = "ws://localhost:8088/socket/chatserver";
+// 	const url = "ws://localhost:8088/socket/chatserver";
+	const url = "ws://" + window.location.host + "/socket/chatserver";
+	//URL주소에 따라 동적으로 접속 주소 변경
+	
 	//서버와의 연결 주소 - 서버에서는  @ServerEndpoint("/chatserver") 종단점을 설정해야함.
 	
 	$(document).ready(function() {
